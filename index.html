@@ -1206,12 +1206,33 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
       ? `Сьогодні: ${n} ${n%10===1&&n%100!==11?'сесія':(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?'сесії':'сесій')} фокусу ` + Array.from({length:Math.min(n,8)}, () => `<img src="${paws}" alt="">`).join('')
       : 'Сьогодні ще не було сесій фокусу';
   }
+  // ---------- тактильний відгук (хаптик) ----------
+  // Android/Chrome: navigator.vibrate. iOS Safari її не підтримує, тому використовуємо прихований перемикач
+  // <input type="checkbox" switch> — на iOS 17.4+ його перемикання дає системний «тік» (лише з жесту користувача).
+  const hapticSwitch = (() => {
+    const l = document.createElement('label'); l.setAttribute('aria-hidden', 'true');
+    l.style.cssText = 'position:fixed;left:-99px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden';
+    const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1;
+    l.appendChild(i); document.body.appendChild(l); return l;
+  })();
+  // kind: 'tick' — крок шкали, 'tap' — натискання, 'done' — завершення сесії
+  function haptic(kind = 'tick'){
+    try {
+      if (navigator.vibrate){
+        navigator.vibrate(kind === 'done' ? [120, 80, 120] : kind === 'tap' ? 14 : 6);
+        return;
+      }
+      hapticSwitch.click();
+      if (kind === 'done') setTimeout(() => hapticSwitch.click(), 120);
+    } catch(_){}
+  }
+
   function setMinutes(m){
     m = Math.max(1, Math.min(60, Math.round(m)));
     if (m === focus.minutes && focus.remaining === m*60) return;
     focus.minutes = m; focus.remaining = m*60;
     dial.classList.remove('done');
-    try { navigator.vibrate && navigator.vibrate(4); } catch(_){}
+    haptic(m % 5 === 0 ? 'tap' : 'tick');   // кожні 5 хв — відчутніше
     drawDial(); setStatus();
   }
 
@@ -1233,7 +1254,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
   }
   dial.addEventListener('pointerdown', e => {
     const p = svgPoint(e), r = Math.hypot(p.x - 150, p.y - 150);
-    if (r < (inFocus() ? 110 : 66)){ playPause(); return; }
+    if (r < (inFocus() ? 110 : 66)){ haptic('tap'); playPause(); return; }
     if (focus.running || r > 150) return;
     e.preventDefault();
     dragId = e.pointerId; dial.setPointerCapture(dragId); dial.classList.add('grabbing');
@@ -1294,7 +1315,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     sessions++; saveSessions();
     dial.classList.remove('done'); void dial.getBoundingClientRect(); dial.classList.add('done');
     chime();
-    try { navigator.vibrate && navigator.vibrate([120, 80, 120]); } catch(_){}
+    haptic('done');
     $('#live').textContent = 'Фокус завершено';
     setStatus();
   }
