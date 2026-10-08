@@ -1,0 +1,504 @@
+<title>Daynest планер</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: one phone-sized app — welcome screen, then two pages side by side (Day | Week/Month) moved by swipe.
+   Colours and controls follow the user's sample sheet «Іконки картинки»; type, spacing and radii from the Daynest system. Single warm light theme. */
+:root{
+  --day:#fef1d9; --cal-top:#fdecce; --card:#fef2d7; --sky:#fdd195; --field:#f7af52; --hill:#fdbf66;
+  --accent:#f67a36; --on-accent:#fffaf0; --chip:#f8dcb1; --tog:#fde5c4;
+  --brown:#5f2507; --dot-ring:#722403;
+  --ink:#2b1a0d; --ink-soft:#4a3322; --ink-muted:#86664a; --ink-faint:#b9a07f;
+  --scrim:rgba(43,26,13,.38);
+  --sans:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px;
+  --r-xs:6px; --r-sm:10px; --r-md:14px; --r-lg:28px; --r-pill:999px;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--cal-top);color:var(--ink);font-family:var(--sans);font-weight:600;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
+[hidden]{display:none!important}
+
+.app{position:relative;width:100%;height:100%;background:var(--day);overflow:hidden}
+@media (min-width:520px) and (min-height:640px){
+  .app{width:390px;height:min(844px,calc(100% - 48px));border-radius:46px;border:1.5px solid var(--ink-soft)}
+}
+
+.title-lg{font-size:25px;line-height:31px;font-weight:800;color:var(--ink);text-wrap:balance}
+.title-md{font-size:21px;line-height:28px;font-weight:800;color:var(--ink)}
+.caption{font-size:13px;line-height:18px;font-weight:600;color:var(--ink-muted)}
+
+/* ---------- welcome ---------- */
+.welcome{position:absolute;inset:0;background:var(--sky);display:flex;flex-direction:column;z-index:5;
+  transition:opacity .45s ease, transform .45s ease}
+.welcome.leaving{opacity:0;transform:translateY(-16px);pointer-events:none}
+.welcome header{padding:calc(var(--space-8) + 8px) var(--space-6) 0;text-align:center}
+.welcome h1{font-size:20px;line-height:26px;font-weight:800;color:var(--ink)}
+.welcome .tag{margin-top:2px;color:var(--ink-soft)}
+.welcome .stage{flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.welcome .stage img{width:100%;height:auto;max-height:100%;object-fit:cover;object-position:bottom}
+.welcome footer{background:var(--field);padding:var(--space-2) var(--space-6) calc(var(--space-8) + 12px)}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;border-radius:var(--r-pill);
+  background:#fef3dd;border:0;font-size:17px;line-height:20px;font-weight:800;color:var(--ink);
+  box-shadow:0 3px 0 rgba(120,60,10,.18)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(120,60,10,.18)}
+
+/* ---------- pager ---------- */
+.main{position:absolute;inset:0}
+.track{display:flex;width:300%;height:100%;transition:transform .38s cubic-bezier(.2,.8,.2,1);touch-action:pan-y;will-change:transform}
+.track.dragging{transition:none}
+.page{width:33.3334%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+
+/* ---------- day ---------- */
+.day{background:var(--day)}
+.day .scroll{flex:1;min-height:0;overflow-y:auto;padding:calc(var(--space-8) + 12px) var(--space-6) var(--space-2);scrollbar-width:none}
+.day .scroll::-webkit-scrollbar{display:none}
+.day-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3)}
+.day-head .sun{width:50px;height:50px;flex:none;margin:-8px -6px 0 0;animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.day .date{margin-top:var(--space-1)}
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:var(--space-4)}
+.chip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;border-radius:var(--r-sm);
+  background:var(--chip);color:var(--ink);font-size:13px;line-height:15px;font-weight:700;position:relative}
+.chip b{font-size:17px;line-height:19px;font-weight:800}
+.chip.sel{background:var(--accent);color:var(--on-accent)}
+.chip.today:not(.sel)::after{content:"";position:absolute;bottom:5px;width:5px;height:5px;border-radius:var(--r-pill);background:var(--accent)}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-top:var(--space-6)}
+.tasks{list-style:none;margin:var(--space-4) 0 0;padding:0;display:flex;flex-direction:column;gap:var(--space-4)}
+.task{display:flex;align-items:flex-start;gap:var(--space-3);touch-action:pan-y;user-select:none;-webkit-user-select:none;
+  transition:transform .25s ease, opacity .35s ease}
+.task.swiping{transition:none;cursor:grabbing}
+.task.done{opacity:.5}
+/* котячі подряпини поверх тексту: кожен кіготь «проводиться» маскою від початку до кінця */
+.task .label,.events li{position:relative}
+.scratch{position:absolute;overflow:visible;pointer-events:none}
+.scratch .reveal{fill:none;stroke:#fff;stroke-width:16;stroke-linecap:round;
+  stroke-dasharray:var(--len) calc(var(--len) + 40px);stroke-dashoffset:var(--len);
+  transition:stroke-dashoffset var(--t,160ms) cubic-bezier(.55,0,.35,1)}
+.task.done .scratch .reveal,.events li.done .scratch .reveal{stroke-dashoffset:0;transition-delay:var(--d)}
+.task.swiping:not(.done) .scratch .reveal{stroke-dashoffset:calc(var(--len) * (1 - var(--p,0)));transition:none}
+.task.swiping.done .scratch .reveal{stroke-dashoffset:calc(var(--len) * var(--p,0));transition:none}
+.scratch .scuff{fill:#e3ad78;opacity:.55}
+.scratch .groove{fill:#5f2507}
+.scratch .shine{fill:#fff6e4;opacity:.8}
+.scratch .fiber{fill:none;stroke:#5f2507;stroke-width:.8;stroke-linecap:round;opacity:.7}
+.crumb{position:absolute;width:3px;height:3px;border-radius:1px;pointer-events:none}
+.check{flex:none;width:26px;height:26px;border-radius:var(--r-xs);border:2px solid var(--brown);background:#fdf4e3;display:grid;place-items:center}
+.check svg{opacity:0;transition:opacity .15s}
+.task.done .check{background:var(--brown)}
+.task.done .check svg{opacity:1}
+.task .label{flex:1;min-width:0;text-align:left;font-size:17px;line-height:26px;color:var(--ink);overflow-wrap:anywhere}
+.task .label .t{color:var(--ink-muted);font-size:14px;margin-left:6px;white-space:nowrap}
+
+.task.pop{animation:pop .4s ease}
+@keyframes pop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.empty{margin-top:var(--space-3);color:var(--ink-muted);font-size:14px;line-height:20px}
+
+.cat-zone{position:relative;flex:none}
+.cat-zone .scene{width:100%;height:auto;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 16%);mask-image:linear-gradient(to bottom,transparent 0,#000 16%)}
+.cat-btn{position:absolute;left:33%;width:54%;top:2%;bottom:6%;border-radius:40% 40% 18% 18%}
+.cat-btn:active + .tap,.cat-btn.tapped + .tap{animation:tap .5s ease}
+.tap{position:absolute;left:58%;top:4%;width:30px;opacity:0;pointer-events:none}
+@keyframes tap{0%{opacity:0;transform:translateY(8px) scale(.6)}40%{opacity:1}100%{opacity:0;transform:translateY(-26px) scale(1)}}
+/* комікс-бульбашка біля котика: вискакує «попом» і сама зникає через кілька секунд */
+.bubble{position:absolute;left:var(--space-4);top:-48px;z-index:1;max-width:146px;padding:8px 12px;
+  background:#fffaf0;border:2.5px solid var(--brown);border-radius:22px 22px 22px 8px;box-shadow:3px 3px 0 var(--brown);
+  font-size:13px;line-height:17px;font-weight:800;color:var(--ink);pointer-events:none;
+  opacity:0;transform:scale(.4) rotate(-8deg);transform-origin:88% 120%;
+  transition:opacity .35s ease, transform .5s cubic-bezier(.34,1.56,.64,1)}
+.bubble.show{opacity:1;transform:scale(1) rotate(-3deg)}
+/* хвостик бульбашки: обвідка (before) і заливка (after), нахилені до котика */
+.bubble::before,.bubble::after{content:"";position:absolute;width:0;height:0;border-style:solid;transform:skewX(-46deg);transform-origin:top}
+.bubble::before{right:16px;bottom:-24px;border-width:24px 3px 0 17px;border-color:var(--brown) transparent transparent transparent}
+.bubble::after{right:20.5px;bottom:-15px;border-width:16px 2px 0 10px;border-color:#fffaf0 transparent transparent transparent}
+/* навігаційна стрілка: лише іконка, напівпрозора, мʼяко «хвилюється» */
+.hint{position:absolute;right:var(--space-3);bottom:4px;width:44px;height:44px;display:grid;place-items:center;
+  border-radius:var(--r-pill);color:var(--brown);opacity:.6;transition:opacity .2s ease}
+.hint:hover,.hint:focus-visible{opacity:.9}
+.hint svg{width:26px;height:26px;transform-origin:35% 50%;animation:jelly 2.8s ease-in-out infinite}
+@keyframes jelly{
+  0%,100%{transform:translate(0,0) scale(1,1) rotate(0)}
+  20%{transform:translate(3px,-2px) scale(1.1,.9) rotate(-5deg)}
+  45%{transform:translate(6px,0) scale(.93,1.08) rotate(3deg)}
+  70%{transform:translate(2px,2px) scale(1.05,.95) rotate(-2deg)}}
+
+/* ---------- week / month ---------- */
+.cal{background:var(--cal-top)}
+.cal .top{flex:none;padding:calc(var(--space-8) + 12px) var(--space-6) var(--space-4)}
+.seg{display:flex;width:max-content;margin:0 auto;padding:5px;border-radius:var(--r-pill);gap:4px;background:var(--tog)}
+.seg button{min-height:38px;padding:0 22px;border-radius:var(--r-pill);font-size:16px;font-weight:800;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-4)}
+.cal-head h2{font-size:18px;line-height:24px;font-weight:800}
+.nav{width:36px;height:36px;border-radius:var(--r-pill);display:grid;place-items:center;color:var(--ink-soft)}
+.nav:hover{background:var(--tog)}
+.wd,.grid{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
+.wd{margin-top:var(--space-2)}
+.wd span{font-size:14px;line-height:18px;color:var(--ink);font-weight:700}
+.grid{row-gap:0;margin-top:var(--space-1)}
+.day-cell{position:relative;height:42px;display:grid;place-items:center;font-size:16px;line-height:20px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.day-cell span{width:34px;height:34px;display:grid;place-items:center;border-radius:var(--r-pill);border:2px solid transparent}
+.day-cell.out{color:var(--ink-faint)}
+.day-cell.sel span{border-color:var(--accent);font-weight:800}
+.day-cell.today span{background:var(--accent);color:var(--on-accent);font-weight:800}
+.day-cell.has::after{content:"";position:absolute;bottom:0;width:5px;height:5px;border-radius:var(--r-pill);background:var(--dot-ring)}
+.grid.week .day-cell{height:70px;align-items:start;padding-top:4px}
+.grid.week .day-cell span{width:42px;height:42px;font-size:17px}
+.grid.week .day-cell .n{position:absolute;bottom:0;font-size:11px;line-height:13px;color:var(--ink-muted);font-weight:700;font-style:normal}
+.grid.week .day-cell.has::after{display:none}
+
+.card{position:relative;flex:1;min-height:0;background:var(--card);overflow-y:auto;padding:var(--space-2) var(--space-6) calc(var(--space-8) + 16px);scrollbar-width:none}
+.card::-webkit-scrollbar{display:none}
+.wave{display:block;width:100%;height:26px;flex:none;margin-bottom:-1px}
+.spot{width:210px;height:auto;margin:0 auto}
+.list-title{margin-top:var(--space-3);font-size:19px;line-height:25px;font-weight:800}
+.events{list-style:none;margin:var(--space-3) 0 0;padding:0;display:flex;flex-direction:column;gap:var(--space-3)}
+.events li{display:flex;align-items:center;gap:var(--space-3);font-size:16px;line-height:22px;color:var(--ink)}
+.events li::before{content:"";flex:none;width:18px;height:18px;border-radius:var(--r-pill);background:var(--accent);border:2px solid var(--dot-ring)}
+.events li .txt{flex:1;min-width:0;overflow-wrap:anywhere}
+.events li .t{flex:none;font-size:14px;color:var(--ink-muted)}
+.events li.done::before{background:#fef5e3;border-color:#d1b48d}
+.events li.done{opacity:.5}
+.swipe-hint{margin-top:var(--space-4);font-size:12px;line-height:16px;color:var(--ink-muted)}
+/* підказка про свайп зникає сама через 5 секунд після старту */
+.swipe-hint{max-height:60px;overflow:hidden;transition:opacity .5s ease, max-height .45s ease .35s, margin-top .45s ease .35s}
+.swipe-hint.gone{opacity:0;max-height:0;margin-top:0}
+.group-label{font-size:12px;line-height:16px;font-weight:800;color:var(--ink-muted);margin-top:var(--space-4);letter-spacing:.02em}
+
+/* ---------- focus ---------- */
+.focus{background:var(--cal-top)}
+.focus-scroll{flex:1;min-height:0;overflow-y:auto;padding:calc(var(--space-8) + 12px) var(--space-6) calc(var(--space-8) + 24px);scrollbar-width:none;
+  display:flex;flex-direction:column;gap:var(--space-4)}
+.focus-scroll::-webkit-scrollbar{display:none}
+.focus-head{text-align:center}
+.focus-head .caption{margin-top:2px}
+.dial-wrap{display:flex;justify-content:center;margin:0 -10px}
+.dial{width:100%;max-width:350px;height:auto;display:block;touch-action:none;user-select:none;-webkit-user-select:none;overflow:visible}
+.dial .knob{cursor:grab;outline:none}
+.dial .knob:focus-visible > circle:nth-child(2){stroke:#2b1a0d;stroke-width:5}
+.dial.grabbing .knob{cursor:grabbing}
+.dial.locked .knob{cursor:default}
+.face-btn{cursor:pointer}
+.eyes-closed{display:none}
+.dial.running .eyes-open{display:none}
+.dial.running .eyes-closed{display:inline}
+.ear{transform-box:fill-box;transform-origin:50% 100%}
+.ear-l{transform-origin:80% 100%}.ear-r{transform-origin:20% 100%}
+.dial.running .ear-l{animation:earL 3.2s ease-in-out infinite}
+.dial.running .ear-r{animation:earR 3.2s ease-in-out infinite .15s}
+@keyframes earL{0%,86%,100%{transform:none}90%{transform:rotate(-9deg)}95%{transform:rotate(4deg)}}
+@keyframes earR{0%,86%,100%{transform:none}90%{transform:rotate(9deg)}95%{transform:rotate(-4deg)}}
+.dial.done{animation:hop .5s ease 3}
+@keyframes hop{0%,100%{transform:none}40%{transform:translateY(-10px)}}
+.dial #knob{transition:transform .08s linear}
+/* running look: scale & numbers fade, face grows to the paw track, paw hides, ring shows time left */
+.dial #ticks,.dial #nums,.dial .guide{transition:opacity .35s ease}
+.dial.focus-mode #ticks,.dial.focus-mode #nums,.dial.focus-mode .guide{opacity:0}
+.dial .face{transform-box:view-box;transform-origin:150px 150px;transition:transform .6s cubic-bezier(.34,1.45,.55,1)}
+.dial.focus-mode .face{transform:scale(1.66)}
+.dial .knob-body{transform-box:fill-box;transform-origin:50% 50%;transition:transform .35s cubic-bezier(.5,-.4,.6,1),opacity .3s ease}
+.dial.focus-mode .knob-body{transform:scale(0) rotate(-90deg);opacity:0}
+.dial.focus-mode .knob{pointer-events:none}
+#arc{transition:stroke-dasharray .7s cubic-bezier(.3,.9,.4,1),opacity .3s}
+.dial.ticking #arc{transition:stroke-dasharray .3s linear,opacity .3s}
+.presets{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.presets button{min-height:38px;padding:0 4px;white-space:nowrap;border-radius:var(--r-pill);background:var(--tog);font-size:14px;font-weight:800;color:var(--ink);
+  border:2px solid transparent}
+.presets button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--brown);box-shadow:0 2px 0 var(--brown)}
+.presets button:disabled{opacity:.45;cursor:default}
+/* нижній блок фокусу: справа, кнопки й сесії притиснуті донизу, ритм 8 px */
+.focus-bottom{margin-top:auto;padding-top:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4)}
+.focus-task{display:flex;flex-direction:column;gap:var(--space-2)}
+.focus-task label{font-size:13px;line-height:16px;font-weight:800;color:var(--ink-soft)}
+.focus-task select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:36px;border-color:var(--chip);
+  background:#fffaf0 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%235f2507' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center}
+.focus-actions{display:grid;grid-template-columns:1fr 2fr;gap:var(--space-3)}
+.focus-actions .btn.primary{border:2.5px solid var(--brown);box-shadow:0 4px 0 var(--brown)}
+.focus-actions .btn.primary:active{box-shadow:0 1px 0 var(--brown)}
+.focus-actions .btn.ghost{border:2.5px solid var(--chip);background:#fffaf0;box-shadow:0 4px 0 var(--chip)}
+.sessions{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;font-size:13px;line-height:18px;font-weight:800;color:var(--ink-muted);min-height:22px}
+.sessions img{width:18px;height:18px}
+
+
+/* ---------- підказка про свайп (перший запуск) ---------- */
+.coach{position:absolute;inset:0;z-index:8;display:flex;align-items:flex-end;justify-content:center;
+  padding:0 var(--space-6) 140px;background:rgba(43,26,13,.22);opacity:0;transition:opacity .35s ease;pointer-events:none}
+.coach.show{opacity:1}
+.coach-card{width:100%;max-width:300px;background:#fffaf0;border:2.5px solid var(--brown);border-radius:22px;box-shadow:4px 4px 0 var(--brown);
+  padding:var(--space-4) var(--space-4) var(--space-3);text-align:center;transform:translateY(16px) scale(.92);
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.coach.show .coach-card{transform:none}
+.coach-card p{font-size:16px;line-height:22px;font-weight:800;color:var(--ink);margin-top:var(--space-2)}
+.coach-skip{display:block;margin-top:var(--space-2);font-size:12px;line-height:16px;font-weight:700;color:var(--ink-muted)}
+.coach-demo{position:relative;height:56px;margin:0 auto;width:200px}
+/* пунктирний слід свайпу зі стрілкою вліво */
+.coach-trail{position:absolute;left:18px;right:18px;top:27px;border-top:3px dashed var(--chip)}
+.coach-trail::before{content:"";position:absolute;left:-4px;top:-8.5px;width:11px;height:11px;border-left:3px solid var(--accent);
+  border-bottom:3px solid var(--accent);transform:rotate(45deg);border-radius:2px}
+.coach-paw{position:absolute;top:6px;left:50%;width:44px;height:44px;margin-left:-22px;animation:coachSwipe 1.6s cubic-bezier(.45,0,.3,1) infinite}
+@keyframes coachSwipe{
+  0%{transform:translateX(70px) scale(.9);opacity:0}
+  15%{transform:translateX(64px) scale(1);opacity:1}
+  70%{transform:translateX(-66px) scale(1) rotate(-8deg);opacity:1}
+  88%,100%{transform:translateX(-72px) scale(.85);opacity:0}}
+
+/* ---------- pager dots ---------- */
+.dots{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
+.dots button{width:8px;height:8px;border-radius:var(--r-pill);background:var(--ink-faint);transition:width .25s,background .25s}
+.dots button[aria-current="true"]{width:22px;background:var(--brown)}
+
+/* ---------- add-plan sheet ---------- */
+.scrim{position:absolute;inset:0;background:var(--scrim);z-index:10;opacity:0;transition:opacity .25s}
+.scrim.open{opacity:1}
+.plan-sheet{position:absolute;left:0;right:0;bottom:0;z-index:11;background:var(--day);border-radius:var(--r-lg) var(--r-lg) 0 0;
+  padding:var(--space-3) var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom,0px));
+  transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.plan-sheet.open{transform:none}
+.grab{width:40px;height:5px;border-radius:var(--r-pill);background:var(--ink-faint);margin:0 auto var(--space-2)}
+.sheet-top{display:flex;align-items:center;gap:var(--space-3)}
+.sheet-top img{width:76px;height:auto;flex:none;margin:-6px 0 -4px -8px}
+.field{display:flex;flex-direction:column;gap:6px;margin-top:var(--space-4)}
+.field label{font-size:13px;line-height:16px;font-weight:800;color:var(--ink-soft)}
+.input{width:100%;min-height:48px;border-radius:var(--r-md);border:2px solid var(--chip);background:#fffaf0;
+  font:600 16px/22px var(--sans);color:var(--ink);padding:10px 12px}
+.input:focus{outline:none;border-color:var(--accent)}
+.input::placeholder{color:var(--ink-muted)}
+textarea.input{resize:none;min-height:74px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+.err{color:#b24a12;font-size:13px;line-height:18px;font-weight:800;margin-top:2px}
+.sheet-actions{display:flex;gap:var(--space-3);margin-top:var(--space-6)}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--ink-soft)}
+.btn.primary{background:var(--accent);color:var(--on-accent);box-shadow:0 3px 0 #c95a1d}
+.del{display:block;margin:var(--space-3) auto 0;font-size:14px;font-weight:800;color:#b24a12;padding:6px 10px;border-radius:var(--r-sm)}
+
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app" id="app">
+
+  <section class="welcome" id="welcome" aria-label="Привітання">
+    <header>
+      <h1>Daynest</h1>
+      <p class="caption tag">Від ідеї до плану — і до виконання</p>
+    </header>
+    <div class="stage">
+      <img src="{{welcome}}" alt="Людина з великим олівцем піднімається сходинками: ідеї, план, виконання">
+    </div>
+    <footer>
+      <button class="btn" id="startBtn" type="button">Розпочати</button>
+    </footer>
+  </section>
+
+  <div class="main" id="main" aria-hidden="true">
+    <div class="track" id="track">
+
+      <section class="page day" id="pageDay" aria-label="План дня">
+        <div class="scroll">
+          <div class="day-head">
+            <div>
+              <h1 class="title-lg" id="dayTitle">Сьогоднішні справи</h1>
+              <p class="caption date" id="dayDate"></p>
+            </div>
+            <img class="sun" src="{{sun}}" alt="">
+          </div>
+          <div class="strip" id="strip" role="group" aria-label="Дні тижня"></div>
+          <div class="section-head">
+            <h2 class="title-md">Список справ</h2>
+            <span class="caption" id="dayCount"></span>
+          </div>
+          <ul class="tasks" id="tasks"></ul>
+          <p class="swipe-hint" id="swipeHint">Проведи по справі вліво або вправо, щоб закреслити. Ще раз — щоб повернути.</p>
+          <p class="empty" id="emptyDay" hidden>На цей день ще немає планів. Натисни на котика, щоб додати перший.</p>
+        </div>
+        <div class="cat-zone">
+          <img class="scene" src="{{catscene}}" alt="">
+          <p class="bubble" id="catBubble" aria-hidden="true">Натисни на мене, щоб додати план</p>
+          <button class="cat-btn" id="catBtn" type="button" aria-label="Додати план"></button>
+          <img class="tap" src="{{paw}}" alt="">
+          <button class="hint" type="button" id="toCal" aria-label="Відкрити тиждень і місяць">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="page cal" id="pageCal" aria-label="Тиждень і місяць">
+        <div class="top">
+          <div class="seg" role="group" aria-label="Режим календаря">
+            <button type="button" data-mode="week" aria-pressed="false">Тиждень</button>
+            <button type="button" data-mode="month" aria-pressed="true">Місяць</button>
+          </div>
+          <div class="cal-head">
+            <button class="nav" type="button" id="prevBtn" aria-label="Назад">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>
+            </button>
+            <h2 id="calTitle"></h2>
+            <button class="nav" type="button" id="nextBtn" aria-label="Вперед">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg>
+            </button>
+          </div>
+          <div class="wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
+          <div class="grid" id="grid"></div>
+        </div>
+        <svg class="wave" viewBox="0 0 390 26" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 14 C60 0 120 2 190 12 C260 22 320 24 390 8 V26 H0Z" fill="#fef2d7"/>
+        </svg>
+        <div class="card">
+          <img class="spot" src="{{calendar}}" alt="">
+          <h3 class="list-title" id="listTitle"></h3>
+          <div id="eventsWrap"></div>
+        </div>
+        <button class="hint" type="button" id="toFocus" aria-label="Відкрити фокус">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg>
+        </button>
+      </section>
+
+      <section class="page focus" id="pageFocus" aria-label="Фокус">
+        <div class="focus-scroll">
+          <div class="focus-head">
+            <h1 class="title-lg">Фокус</h1>
+            <p class="caption" id="focusHint">Покрути лапку по шкалі, щоб задати час</p>
+          </div>
+
+          <div class="dial-wrap">
+            <svg class="dial" id="dial" viewBox="-26 2 352 304" aria-hidden="false">
+              <g stroke="#5f2507" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- whiskers -->
+                <g class="whiskers" fill="none" stroke-width="3">
+                  <path d="M16 146 L-18 134 M14 162 L-20 164 M18 178 L-14 192"/>
+                  <path d="M284 146 L318 134 M286 162 L320 164 M282 178 L314 192"/>
+                </g>
+                <!-- ears -->
+                <g class="ear ear-l">
+                  <path d="M36 72 L30 20 Q31 9 41 12 L99 23 Z" fill="#f6a35c"/>
+                  <path d="M48 56 L45 28 L78 33 Z" fill="#fbcfa3" stroke="none"/>
+                </g>
+                <g class="ear ear-r">
+                  <path d="M264 72 L270 20 Q269 9 259 12 L201 23 Z" fill="#f6a35c"/>
+                  <path d="M252 56 L255 28 L222 33 Z" fill="#fbcfa3" stroke="none"/>
+                </g>
+                <!-- plate -->
+                <circle cx="150" cy="157" r="142" fill="#e9a35e" stroke="none"/>
+                <circle cx="150" cy="150" r="142" fill="#fef2d7"/>
+              </g>
+              <!-- track + arc -->
+              <circle cx="150" cy="150" r="122" fill="none" stroke="#fde5c4" stroke-width="22"/>
+              <circle id="arc" cx="150" cy="150" r="122" fill="none" stroke="#f67a36" stroke-width="22" stroke-linecap="round"
+                      transform="rotate(-90 150 150)" stroke-dasharray="0 999"/>
+              <circle class="guide" cx="150" cy="150" r="133.5" fill="none" stroke="#5f2507" stroke-width="2" opacity=".35"/>
+              <circle class="guide" cx="150" cy="150" r="110.5" fill="none" stroke="#5f2507" stroke-width="2" opacity=".35"/>
+              <g id="ticks" stroke="#5f2507" stroke-linecap="round"></g>
+              <g id="nums" font-family="Nunito, ui-rounded, sans-serif" font-weight="800" font-size="13" fill="#86664a" text-anchor="middle"></g>
+              <!-- face -->
+              <g id="face" class="face">
+              <circle cx="150" cy="150" r="66" fill="#fffaf0" stroke="#5f2507" stroke-width="3.5" vector-effect="non-scaling-stroke" id="faceBtn" class="face-btn"/>
+              <g class="eyes-open" fill="#2b1a0d">
+                <ellipse cx="128" cy="113" rx="4.5" ry="5.5"/><ellipse cx="172" cy="113" rx="4.5" ry="5.5"/>
+              </g>
+              <g class="eyes-closed" fill="none" stroke="#2b1a0d" stroke-width="3" stroke-linecap="round">
+                <path d="M122 114 q6 -7 12 0"/><path d="M166 114 q6 -7 12 0"/>
+              </g>
+              <ellipse cx="114" cy="124" rx="8" ry="4.5" fill="#f9a77a" opacity=".6"/>
+              <ellipse cx="186" cy="124" rx="8" ry="4.5" fill="#f9a77a" opacity=".6"/>
+              <text id="timeText" x="150" y="160" text-anchor="middle" font-family="Nunito, ui-rounded, sans-serif" font-weight="800" font-size="38" fill="#2b1a0d">25:00</text>
+              <path d="M146 172 h8 l-4 4 z" fill="#e0703a" stroke="#5f2507" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M150 176 q-4 6 -9 3 M150 176 q4 6 9 3" fill="none" stroke="#5f2507" stroke-width="2.2" stroke-linecap="round"/>
+              <text id="subText" x="150" y="199" text-anchor="middle" font-family="Nunito, ui-rounded, sans-serif" font-weight="800" font-size="11.5" fill="#86664a">хвилин фокусу</text>
+              </g>
+              <!-- knob (paw) -->
+              <g id="knob" class="knob" tabindex="0" role="slider" aria-label="Тривалість фокусу, хвилин" aria-valuemin="1" aria-valuemax="60" aria-valuenow="25">
+                <g class="knob-body">
+                <circle r="21" cx="0" cy="3" fill="#c95a1d"/>
+                <circle r="21" fill="#fffaf0" stroke="#5f2507" stroke-width="3.5"/>
+                <g fill="#5f2507">
+                  <ellipse cx="0" cy="4" rx="7" ry="5.6"/>
+                  <ellipse cx="-8" cy="-5" rx="2.8" ry="3.4"/><ellipse cx="-3" cy="-9.5" rx="2.8" ry="3.4"/>
+                  <ellipse cx="3" cy="-9.5" rx="2.8" ry="3.4"/><ellipse cx="8" cy="-5" rx="2.8" ry="3.4"/>
+                </g>
+                </g>
+              </g>
+            </svg>
+          </div>
+
+          <div class="presets" role="group" aria-label="Швидкий вибір часу" id="presets">
+            <button type="button" data-min="5">5 хв</button>
+            <button type="button" data-min="15">15 хв</button>
+            <button type="button" data-min="25">25 хв</button>
+            <button type="button" data-min="45">45 хв</button>
+            <button type="button" data-min="60">60 хв</button>
+          </div>
+
+          <div class="focus-bottom">
+          <div class="focus-task">
+            <label for="focusTask">Над чим працюєш?</label>
+            <select id="focusTask" class="input"></select>
+          </div>
+
+          <div class="focus-actions">
+            <button class="btn ghost" type="button" id="resetBtn">Скинути</button>
+            <button class="btn primary" type="button" id="playBtn">Почати</button>
+          </div>
+
+          <p class="sessions" id="sessions"></p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <nav class="dots" aria-label="Сторінки">
+      <button type="button" data-page="0" aria-label="План дня" aria-current="true"></button>
+      <button type="button" data-page="1" aria-label="Тиждень і місяць" aria-current="false"></button>
+      <button type="button" data-page="2" aria-label="Фокус" aria-current="false"></button>
+    </nav>
+
+    <!-- підказка про свайп: показується лише при першому запуску -->
+    <div class="coach" id="coach" hidden>
+      <div class="coach-card" role="status">
+        <div class="coach-demo" aria-hidden="true">
+          <span class="coach-trail"></span>
+          <img class="coach-paw" src="{{paw}}" alt="">
+        </div>
+        <p>Свайпни вліво, щоб відкрити тиждень, місяць і фокус</p>
+        <span class="coach-skip">Торкнись, щоб закрити</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <form class="plan-sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden novalidate>
+    <div class="grab" aria-hidden="true"></div>
+    <div class="sheet-top">
+      <img src="{{catwink}}" alt="">
+      <h2 class="title-md" id="sheetTitle">Новий план</h2>
+    </div>
+    <div class="field">
+      <label for="planText">Що плануєш зробити?</label>
+      <textarea class="input" id="planText" rows="2" maxlength="120" placeholder="Наприклад: прочитати 10 сторінок книги"></textarea>
+      <p class="err" id="planErr" hidden>Напиши, що саме плануєш.</p>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="planDate">День</label>
+        <input class="input" id="planDate" type="date" required>
+      </div>
+      <div class="field">
+        <label for="planTime">Час (необовʼязково)</label>
+        <input class="input" id="planTime" type="time">
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn ghost" type="button" id="cancelBtn">Скасувати</button>
+      <button class="btn primary" type="submit" id="saveBtn">Додати</button>
+    </div>
+    <button class="del" type="button" id="deleteBtn" hidden>Видалити план</button>
+  </form>
+
+  <p class="vh" aria-live="polite" id="live"></p>
+</div>
