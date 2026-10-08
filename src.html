@@ -278,7 +278,13 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .input:focus{outline:none;border-color:var(--accent)}
 .input::placeholder{color:var(--ink-faint);font-weight:600}
 textarea.input{resize:none;min-height:80px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-3)}
+/* Safari/iOS: поля дати й часу мають власну мінімальну ширину та внутрішній відступ — без цього вони налазять одне на одне */
+.row .field{min-width:0}
+.input{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none}
+input.input[type="date"],input.input[type="time"]{display:block;height:52px;padding-top:0;padding-bottom:0;text-align:left;line-height:48px;overflow:hidden}
+input.input[type="date"]::-webkit-date-and-time-value,input.input[type="time"]::-webkit-date-and-time-value{text-align:left;min-height:1.4em;margin:0}
+input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webkit-datetime-edit{padding:0}
 .err{color:#b24a12;font-size:13px;line-height:18px;font-weight:800;margin-top:2px}
 /* головна дія — вдвічі ширша за «Скасувати» */
 .sheet-actions{display:grid;grid-template-columns:1fr 2fr;gap:var(--space-3);margin-top:var(--space-6)}
