@@ -1384,10 +1384,11 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     if (focus.running){
       focus.running = false; clearInterval(focus.timer);
       focus.remaining = Math.max(0, (focus.endAt - Date.now()) / 1000);
-      if (timerMusic) musicPause();     // пауза таймера — пауза музики, яку запустив таймер
+      musicPause();                     // зупинка таймера — зупинка музики
     } else {
       // старт (виклик іде з жесту користувача, тож браузер дозволяє звук): грає музика, якщо її не вимкнули кнопкою
-      if (bgm.paused && !musicMuted){ timerMusic = true; musicPlay(); }
+      musicMuted = false; try { localStorage.setItem(MUSIC_KEY, 'on'); } catch(_){}
+      timerMusic = true; musicPlay();   // старт таймера завжди вмикає музику
       try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume && audio.resume(); } catch(_){}
       if (focus.remaining <= 0) focus.remaining = focus.minutes*60;
       dial.classList.remove('done', 'ticking'); focus.finished = false; clearTimeout(focus.back);
@@ -1407,7 +1408,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     dial.classList.remove('done'); void dial.getBoundingClientRect(); dial.classList.add('done');
     chime();
     haptic('done');
-    if (timerMusic){ musicFadeOut(); timerMusic = false; }   // сесію завершено — музика затихає
+    musicFadeOut(); timerMusic = false;   // сесію завершено — музика затихає
     $('#live').textContent = 'Фокус завершено';
     setStatus();
   }
@@ -1415,7 +1416,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
   $('#resetBtn').addEventListener('click', () => {
     focus.running = false; clearInterval(focus.timer); clearTimeout(focus.back); focus.finished = false;
     focus.remaining = focus.minutes*60; dial.classList.remove('done', 'ticking');
-    if (timerMusic){ musicPause(); timerMusic = false; }
+    musicPause(); timerMusic = false;   // скидання таймера — музика зупиняється
     drawDial(); setStatus();
   });
 
