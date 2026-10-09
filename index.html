@@ -68,7 +68,13 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .day-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3)}
 /* заголовок дня — єдиний найбільший елемент; дата під ним — тихий підпис */
 .day-head .title-lg{font-size:26px;line-height:32px;letter-spacing:-.2px}
-.day-head .sun{width:50px;height:50px;flex:none;margin:-8px -6px 0 0;animation:spin 40s linear infinite}
+/* сонце — невидима кнопка «на сьогодні»: розмір, місце й анімація картинки ті самі, лише ширша зона дотику */
+.sun-btn{position:relative;flex:none;width:50px;height:50px;margin:-8px -6px 0 0;padding:0;border:0;background:none;box-shadow:none;
+  border-radius:50%;-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
+.sun-btn::after{content:"";position:absolute;inset:-6px}
+.sun-btn:hover,.sun-btn:active{background:none;box-shadow:none}
+.sun-btn:focus{outline:none}
+.day-head .sun{display:block;width:50px;height:50px;animation:spin 40s linear infinite;pointer-events:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .day .date{margin-top:var(--space-1);font-size:14px;line-height:20px;text-transform:none}
 .day .date::first-letter{text-transform:uppercase}
@@ -115,7 +121,12 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 
 .cat-zone{position:relative;flex:none}
 .cat-zone .scene{width:100%;height:auto;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 16%);mask-image:linear-gradient(to bottom,transparent 0,#000 16%)}
-.cat-btn{position:absolute;left:33%;width:54%;top:2%;bottom:6%;border-radius:40% 40% 18% 18%}
+.cat-btn{position:absolute;left:33%;width:54%;top:2%;bottom:6%;border-radius:40% 40% 18% 18%;
+  background:transparent;border:0;padding:0;box-shadow:none;outline:none;-webkit-appearance:none;appearance:none;
+  -webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.cat-btn:hover,.cat-btn:active,.cat-btn:focus,.cat-btn.tapped{background:transparent;border:0;box-shadow:none;outline:none}
+/* рамка фокуса — лише при навігації з клавіатури (клас kbd ставиться на <html> після натискання клавіші) */
+.kbd .cat-btn:focus-visible,.kbd .sun-btn:focus-visible{outline:3px solid var(--brown);outline-offset:2px}
 .cat-btn:active + .tap,.cat-btn.tapped + .tap{animation:tap .5s ease}
 .tap{position:absolute;left:58%;top:4%;width:30px;opacity:0;pointer-events:none}
 @keyframes tap{0%{opacity:0;transform:translateY(8px) scale(.6)}40%{opacity:1}100%{opacity:0;transform:translateY(-26px) scale(1)}}
@@ -288,6 +299,20 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
   padding:var(--space-3) var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom,0px));
   transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
 .plan-sheet.open{transform:none}
+/* шапка шторки (котик + «Новий план») — зона, за яку шторку тягнуть вниз, щоб закрити */
+.sheet-head{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;margin:0 calc(var(--space-6) * -1);padding:0 var(--space-6);padding-bottom:var(--space-1)}
+.sheet-head:active{cursor:grabbing}
+.plan-sheet.dragging{transition:none}
+#planRemind{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:36px;
+  background:#fffaf0 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%235f2507' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center}
+.remind-note{font-size:12px;line-height:16px;font-weight:600;color:var(--ink-muted)}
+/* повідомлення-нагадування всередині застосунку */
+.toast{position:absolute;left:var(--space-4);right:var(--space-4);top:calc(var(--space-4) + env(safe-area-inset-top,0px));z-index:30;display:flex;flex-direction:column;gap:2px;text-align:left;
+  padding:12px 16px;border-radius:var(--r-md);background:#fffaf0;border:2.5px solid var(--brown);box-shadow:0 4px 0 var(--brown);color:var(--ink);
+  transform:translateY(-160%);opacity:0;transition:transform .4s cubic-bezier(.34,1.4,.64,1),opacity .25s ease}
+.toast.show{transform:none;opacity:1}
+.toast b{font-size:14px;line-height:18px;font-weight:800;color:var(--accent)}
+.toast span{font-size:15px;line-height:20px;font-weight:700}
 .grab{width:40px;height:5px;border-radius:var(--r-pill);background:var(--ink-faint);margin:0 auto var(--space-2)}
 .sheet-top{display:flex;align-items:center;gap:var(--space-3)}
 .sheet-top img{width:68px;height:auto;flex:none;margin:-4px 0 -4px -6px}
@@ -340,7 +365,9 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
               <h1 class="title-lg" id="dayTitle">Сьогоднішні справи</h1>
               <p class="caption date" id="dayDate"></p>
             </div>
-            <img class="sun" src="data:image/webp;base64,UklGRugHAABXRUJQVlA4WAoAAAAQAAAAVAAAVAAAQUxQSJMBAAABkGvbtmlLs2wjtm3bto3PqMrMyHZkZtVeWPqCyuzs5dXaCM66Z++99iknETEBcnqLB6repwDVw38c0NXdYkgGcMJZPUCixgVwhZlIFo7qfcgiwvdIHzGV3iJM49/MVPhRTHm0CIs6BlM+rQ8eMOXVoE86TPk1SIYpzxGm1QGP50WQb2B6CUr/CFC+hNfQjuPKlqh7rHxbEjuv3sTPaRApMyLpgWxIXFFkws+JLE5UEw7bVNP1aiIRgbeM3n4aE1iL4DeF0X4Ijkahj4+mLTQp2vWgTYW2PorRdCCgoUw/CrigxB5+WL49jMphlIOmOciBsqxLdjQPJVOmGxPtzkWJlG8S5ZxAWXeI1jYvKZLyj6Js276/V0MKUsmz3p4B1JJ6l3iikqOAxq5OUdxZwu6gQIp7HXXHbBMUbHDTD2Y3pX5tcNQLZjel/2awywdmY3ncbrDCA2ZXhU9jXZhuGgxIh6mI74BXYbpkkAxTMSlG0BUDF/Kk3m5a+JKAOakEipxCDFW2SXL+d0qA/vRTRcOpotUAAFZQOCAuBgAAcCIAnQEqVQBVAD4xFIhCoiEhF4rWGCADBLQG2ArQD9AM8AgAD8ALWpQDXzOHfjl7G1N/oX4I1QHn+8af5r7uPcB6kPtA9wD9Pf1l/rPYA8wH8u/vP69+9d/QP0z9xX65/qN8AH7B///sAPQH/cP02f2q+Cv9uf2n9ozMUOsX+DHQ37sZa3BDSlTMvGP+Z/6D2CP5Z/XfSA9gH6zexZ+sCU38CDvYb1sszH2YeGpqjoZ8fNzk/R3Vt1KMx/uWw/W0Oed/qGiuCETdW6XgkPiRIu5sUKcpNlyR4WXxE7oPVJcyTgFuHhTuOf2uPJybMch4Jfi2ybjKexczG+xYdi10l3AqBDK4HjmsiY1LimTQRwc++DH7vMMv5/gXUoAA/v/ykU4/6EGmyFVbXBIKbRdr0hZ64Lg/Vs/tMGXxP//LQsto3FENzrzhzkEgRqqVGzzXtUS9b+x3E6GrwESK5TIaKV3JE5/pNKhLeey07zMOUuUO9SgdrzHJcblzty+xVzKhKbhrOjV0r5eg9cdkkhdQurkv2rUwP320EYVylbbOcH2PWPIv8eUfpfPS4vhP/77Nb/UN8zv6M16qrWHxNaeZAmFJlM2SxhpuzneHiHB3BSCSLbcrZdYs/+Eo82WQzYKe04tyAly8R6mpCye6ZGqcHtVywRGlnWbL5LUYfuwGsfwfGd5neNeE9+8Rf4Os9tIZoq2BBWoN/uJx2XHRAn+elmmiMB8Eek4GYs2WQDgZQu6J9TEurvZMvnWqMrx+KFhffAJV4lP8Xdkx+Io2QDWBI5MN3NiGX2JHRcz9TGvTnRfkuU+2JHnYvFwkntZ6Onjwb44gGZkacDoRNFZJkD8r6H9n21sQXKER+9JAp+JVGgRQ/SkbQhLrmY6ik6+JVCJ2lAN8pD3Wu+KBGAfeyeS/nD0e8WR6/dFrxTlIg9wFoicUu4LzDS55tWmRTw04AM3IvlejUUxpf9AsEn2/RcXjJLx5qx5FEAGLXsQFDdimxpV/28/mLRMnaBb7Pcj6OQ68Lgqd9zE6y6ub5OnXVEit6UFHq1ln1TnYp7MhG6I83W/2Mczc/PJWS8Qf289Q6PaBmwtxlYkYS7Bv+Vm/cQqnVWgoNHUYttVtnMtcn+i4WhdUddHjtvNmMn1rRQ6umyTm0g577ZseBhQMd07L0baNjfEiL0k+75eZD8AMpKOvoLNG1jYwykgx6VvEi/9Fy8g6zdq32KXfza9Ga808tJvQkl3Mc/4Oqznc+CL3Y5Xis9V54UDcmz8bWiy9L68hHZeCcTcOheWfE7K5TkFIwg+4vBpZwhuWf8ipOah4APGleaci82D1T+YtfDnEkzX16bjpp/xt3HI3zGDKfFPrB+uYYXkwFGS+s+1mciFwRXfhwZK7YRDaOKw9J22F73PrYvpb3Cx+3ZQVvwmaDeB/H9ebnUyX26aG0w2locWaSAwrLknl/+HSPlGl6WYf677VUukhY/H+Okf6FdIR6caozyNtYVrnhggeLgpSTZpxCOrWCUJK0wmEiW7t09/9Kafj90Arl3yWI8KimXggLH04JyYDx1ES/C5riDF86vF18/pOPZiXOKz5KbExVKHkZKbfq+SgjUrBWkQ8d9whsM9gXp9GBAJh2/V2RKa74OWYLgLvzLhd08RCCx7lPG0ugGYZ+A6ooPrdcDzhox74gx++Pi2b1gkR8ZcO/fhS4RdcruG//amuysotk/M+k6/H286ML96QD/MAGZxeYWr1SfatsB36JWbCGDj4nTLrvAnRnfmFvDNK/69YBJBXM7Wa16Q8wE8A6D/0s8UM5BddIWV0wLJkuOFHzeZAXT1xM28uJOHK0UO2/SMuB1Vv4fwJxFQIj1Ew+FoXHlNrOZlp0EJOMo+E4E/v1rjl4/812wPyqdnRh6Dbb/H+KFX0G1cfA7lpyaBcK6W0l637KyyPY+XJINygaSrfyiq/yhKJMmhbq8Iu2nwj5P5fvMblOwiWGKcFD9U83ifLv6cxkn0m5L/NZ8n+pRx5dWkZ5jYnKsw+InD9ofDOGYB2aaDNcai+8IY4skt6z5ZvzFCSoV9AT6QKlA1N1rzJcGI8/4VO2Wdd/V7E2sMsBfauN4AqJIM6HwAAAA==" alt="">
+            <button class="sun-btn" id="sunBtn" type="button" aria-label="Повернутися на сьогодні">
+              <img class="sun" src="data:image/webp;base64,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" alt="">
+            </button>
           </div>
           <div class="strip" id="strip" role="group" aria-label="Дні тижня"></div>
           <div class="section-head">
@@ -515,10 +542,12 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
 
   <div class="scrim" id="scrim" hidden></div>
   <form class="plan-sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden novalidate>
+    <div class="sheet-head" id="sheetHead">
     <div class="grab" aria-hidden="true"></div>
     <div class="sheet-top">
       <img src="data:image/webp;base64,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" alt="">
       <h2 class="title-md" id="sheetTitle">Новий план</h2>
+    </div>
     </div>
     <div class="field">
       <label for="planText">Що плануєш зробити?</label>
@@ -535,6 +564,18 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
         <input class="input" id="planTime" type="time">
       </div>
     </div>
+    <div class="field" id="remindField" hidden>
+      <label for="planRemind">Нагадування</label>
+      <select class="input" id="planRemind">
+        <option value="0">Без нагадування</option>
+        <option value="5">За 5 хвилин</option>
+        <option value="15">За 15 хвилин</option>
+        <option value="30">За 30 хвилин</option>
+        <option value="45">За 45 хвилин</option>
+        <option value="60">За 1 годину</option>
+      </select>
+      <p class="remind-note" id="remindNote" hidden></p>
+    </div>
     <div class="sheet-actions">
       <button class="btn ghost" type="button" id="cancelBtn">Скасувати</button>
       <button class="btn primary" type="submit" id="saveBtn">Додати</button>
@@ -542,6 +583,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     <button class="del" type="button" id="deleteBtn" hidden>Видалити план</button>
   </form>
 
+  <button class="toast" id="toast" type="button" hidden><b id="toastTitle"></b><span id="toastText"></span></button>
   <p class="vh" aria-live="polite" id="live"></p>
 </div>
 
@@ -562,8 +604,14 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
   const longDate = d => `${d.getDate()} ${MONTH_GEN[d.getMonth()]} ${d.getFullYear()}`;
   const uid = () => Math.random().toString(36).slice(2,10);
 
-  const today = new Date(); today.setHours(0,0,0,0);
-  const TODAY = keyOf(today);
+  let today = new Date(); today.setHours(0,0,0,0);
+  let TODAY = keyOf(today);
+  // системна дата могла змінитися (застосунок відкритий по півночі) — перечитуємо її в локальному часовому поясі
+  function refreshToday(){
+    const n = new Date(); n.setHours(0,0,0,0);
+    const k = keyOf(n); if (k === TODAY) return false;
+    today = n; TODAY = k; return true;
+  }
 
   // ---------- storage (per-browser) ----------
   const STORE = 'daynest-tasks-v1';
@@ -580,7 +628,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
       {id:uid(), date:k(5), text:'Візит до стоматолога', time:'09:30', done:false},
     ];
   }
-  function save(){ try { localStorage.setItem(STORE, JSON.stringify(tasks)); } catch(e) {} }
+  function save(){ try { localStorage.setItem(STORE, JSON.stringify(tasks)); } catch(e) {} if (typeof checkReminders === 'function') checkReminders(); }
 
   let tasks = load();
   const state = { selected: TODAY, page: 0, mode: 'month', cursor: new Date(today.getFullYear(), today.getMonth(), 1) };
@@ -837,6 +885,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     t.done = !t.done; t.doneAt = t.done ? Date.now() : 0;
     if (t.done){ t.scratch = +li.dataset.style || 0; lastScratch = t.scratch; }
     save();
+    renderCal();   // сторінка тижня/місяця оновлюється одразу, не чекаючи анімації
     li.classList.toggle('done', t.done);
     li.querySelector('.check').setAttribute('aria-checked', t.done);
     $('#live').textContent = t.done ? 'Справу закреслено' : 'Справу повернуто';
@@ -856,7 +905,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
       const mx = e.clientX - sx, my = e.clientY - sy;
       if (!drag){
         // свайп справа наліво на справі вимкнено: жодної дії; відмічаємо жест, щоб його відпускання не відкрило справу кліком
-        if (mx < -8 && Math.abs(mx) > Math.abs(my) * 1.2){ ignored = true; return; }
+        if (mx < -8 && Math.abs(mx) > Math.abs(my) * 1.2){ ignored = true; return; }   // жест вліво належить pager'у
         if (mx > 8 && Math.abs(mx) > Math.abs(my) * 1.2){ drag = true; li.classList.add('swiping'); try { li.setPointerCapture(id); } catch(_){} }
         else if (Math.abs(my) > 10){ on = false; return; }
         else return;
@@ -926,13 +975,13 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     const wrap = $('#eventsWrap'); wrap.innerHTML = '';
     if (state.mode === 'month'){
       $('#listTitle').textContent = `Плани на ${sel.getDate()} ${MONTH_GEN[sel.getMonth()]}`;
-      const list = byDate(state.selected);
-      wrap.appendChild(list.length ? eventList(list) : emptyNote());
+      const all = byDate(state.selected), list = all.filter(t => !t.done);   // виконані тут приховані (у сховищі лишаються)
+      wrap.appendChild(list.length ? eventList(list) : emptyNote(false, all.length > 0));
     } else {
       $('#listTitle').textContent = 'Плани на тиждень';
       let any = false;
       for (let i = 0; i < 7; i++){
-        const x = addDays(start, i), list = byDate(keyOf(x));
+        const x = addDays(start, i), list = byDate(keyOf(x)).filter(t => !t.done);
         if (!list.length) continue;
         any = true;
         const h = document.createElement('p');
@@ -941,7 +990,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
         wrap.appendChild(h);
         wrap.appendChild(eventList(list));
       }
-      if (!any) wrap.appendChild(emptyNote(true));
+      if (!any) wrap.appendChild(emptyNote(true, tasks.some(t => t.date >= keyOf(start) && t.date <= keyOf(addDays(start, 6)))));
       else wrap.firstChild.style.marginTop = 'var(--space-3)';
     }
     scratchEvents();
@@ -964,8 +1013,9 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
       if (t) addScratch(li, 'c' + t.id, scratchOf(t));
     });
   }
-  function emptyNote(week){
+  function emptyNote(week, allDone){
     const p = document.createElement('p'); p.className = 'empty';
+    if (allDone){ p.textContent = week ? 'Усі плани цього тижня виконано.' : 'Усі плани на цей день виконано.'; return p; }
     p.textContent = week ? 'Цього тижня планів ще немає. Поверніться до дня й натисніть на котика.' : 'На цей день планів немає. Поверніться до дня й натисніть на котика.';
     return p;
   }
@@ -979,6 +1029,15 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     renderAll();
   }
   function renderAll(){ renderDay(); renderCal(); renderFocusTasks(); }
+  // сонце: повернення на сьогоднішній день за поточною системною датою
+  $('#sunBtn').addEventListener('click', () => {
+    refreshToday();
+    state.cursor = new Date(today.getFullYear(), today.getMonth(), 1);
+    select(TODAY);
+    const box = $('#taskScroll'); if (box) box.scrollTo({top: 0, behavior: 'smooth'});
+    $('#live').textContent = 'Показано сьогоднішній день';
+  });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && refreshToday()) renderAll(); });
   const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   $('#prevBtn').addEventListener('click', () => shift(-1));
@@ -1009,7 +1068,6 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     const w = $('#welcome');
     w.hidden = true; w.classList.remove('leaving');
     $('#main').setAttribute('aria-hidden','false');
-    if (!auto) $('#catBtn').focus({preventScroll:true});   // при автозапуску не фокусуємо — інакше з'являється рамка фокуса на котику
     // перший запуск: спершу підказка про свайп, потім бульбашка котика
     if (coachSeen()) showBubble(); else showCoach();
     // текст «Проведи по справі…» ховаємо через 5 секунд
@@ -1075,16 +1133,20 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
   document.querySelectorAll('.dots button').forEach(b => b.addEventListener('click', () => go(+b.dataset.page)));
   $('#toCal').addEventListener('click', () => go(1));
 
-  let sx = 0, sy = 0, dx = 0, tracking = false, dragging = false, suppress = false, pid = null;
+  let sx = 0, sy = 0, dx = 0, tracking = false, dragging = false, suppress = false, pid = null, onTask = false;
   track.addEventListener('pointerdown', e => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-    if (e.target.closest('.task, .dial')) return;
+    if (e.target.closest('.dial')) return;
+    // жест міг початися над справою: далі вирішує напрям (вліво — сторінки, вправо — закреслення справи)
+    onTask = !!e.target.closest('.task');
     tracking = true; dragging = false; sx = e.clientX; sy = e.clientY; dx = 0; pid = e.pointerId;
   });
   track.addEventListener('pointermove', e => {
     if (!tracking || e.pointerId !== pid) return;
     const mx = e.clientX - sx, my = e.clientY - sy;
     if (!dragging){
+      // вправо над справою — це свайп самої справи, pager не втручається
+      if (onTask && mx > 10 && Math.abs(mx) > Math.abs(my) * 1.2){ tracking = false; return; }
       if (Math.abs(mx) > 10 && Math.abs(mx) > Math.abs(my) * 1.2){ dragging = true; track.classList.add('dragging'); try{ track.setPointerCapture(pid); }catch(_){} }
       else if (Math.abs(my) > 10){ tracking = false; return; }
       else return;
@@ -1138,6 +1200,9 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     $('#planText').value = task ? task.text : '';
     $('#planDate').value = task ? task.date : state.selected;
     $('#planTime').value = task ? task.time : '';
+    $('#planRemind').value = String(task && task.time ? (task.remind || 0) : 0);
+    updateRemindField();
+    sheet.style.transform = ''; scrim.style.opacity = ''; sheet.classList.remove('dragging');
     $('#deleteBtn').hidden = !task;
     $('#planErr').hidden = true;
     sheet.hidden = false; scrim.hidden = false;
@@ -1149,8 +1214,126 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     sheet.classList.remove('open'); scrim.classList.remove('open');
     $('#main').inert = false;
     setTimeout(() => { sheet.hidden = true; scrim.hidden = true; }, 320);
-    if (lastFocus && lastFocus.isConnected) lastFocus.focus({preventScroll:true}); else $('#catBtn').focus({preventScroll:true});
+    // фокус повертаємо лише при роботі з клавіатури; після дотику — знімаємо, інакше навколо котика зʼявляється рамка
+    if (document.documentElement.classList.contains('kbd')){
+      if (lastFocus && lastFocus.isConnected) lastFocus.focus({preventScroll:true}); else $('#catBtn').focus({preventScroll:true});
+    } else if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
   }
+  // ---------- закриття шторки свайпом вниз за шапку ----------
+  const sheetHead = $('#sheetHead');
+  let shDragId = null, shDragY0 = 0, shDragLastY = 0, shDragLastT = 0, shDragV = 0, shDragOn = false;
+  sheetHead.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    shDragId = e.pointerId; shDragY0 = shDragLastY = e.clientY; shDragLastT = e.timeStamp; shDragV = 0; shDragOn = false;
+  });
+  sheetHead.addEventListener('pointermove', e => {
+    if (e.pointerId !== shDragId) return;
+    const dy = e.clientY - shDragY0;
+    if (!shDragOn){
+      if (Math.abs(dy) < 6) return;          // дрібне тремтіння пальця — ще не жест
+      shDragOn = true; sheet.classList.add('dragging');
+      try { sheetHead.setPointerCapture(shDragId); } catch(_){}
+    }
+    const dt = Math.max(1, e.timeStamp - shDragLastT);
+    shDragV = (e.clientY - shDragLastY) / dt; shDragLastY = e.clientY; shDragLastT = e.timeStamp;
+    const off = dy > 0 ? dy : dy * 0.12;      // вгору — лише легкий опір
+    sheet.style.transform = `translateY(${off}px)`;
+    scrim.style.opacity = String(Math.max(0, 1 - Math.max(0, dy) / (sheet.offsetHeight * 1.1)));
+  });
+  const shEndDrag = e => {
+    if (e.pointerId !== shDragId) return;
+    shDragId = null; if (!shDragOn) return; shDragOn = false;
+    const dy = e.clientY - shDragY0;
+    sheet.classList.remove('dragging');
+    // закриваємо, якщо потягнули достатньо далеко або швидким рухом вниз
+    const far = dy > Math.min(120, sheet.offsetHeight * 0.28);
+    const fling = shDragV > 0.4 && dy > 30;
+    if (e.type !== 'pointercancel' && (far || fling)){
+      sheet.style.transform = 'translateY(105%)'; scrim.style.opacity = '';
+      closeSheet();
+      setTimeout(() => { sheet.style.transform = ''; }, 420);
+    } else {
+      sheet.style.transform = ''; scrim.style.opacity = '';   // повертаємо на місце
+    }
+  };
+  sheetHead.addEventListener('pointerup', shEndDrag);
+  sheetHead.addEventListener('pointercancel', shEndDrag);
+
+  // ---------- нагадування ----------
+  // Працюють, ПОКИ ЗАСТОСУНОК ВІДКРИТИЙ у браузері (вкладка або встановлений PWA): сервера для push-сповіщень немає,
+  // а «заплановані» сповіщення браузери не підтримують. Перевірка йде кожні ≤30 с і при поверненні у вкладку.
+  const notifyState = () => !('Notification' in window) ? 'unsupported' : Notification.permission;
+  function updateRemindField(){
+    const has = !!$('#planTime').value;
+    $('#remindField').hidden = !has;
+    if (!has) $('#planRemind').value = '0';
+    const note = $('#remindNote'), v = +$('#planRemind').value;
+    if (!has || !v){ note.hidden = true; return; }
+    const st = notifyState();
+    note.hidden = false;
+    note.textContent = st === 'granted' ? 'Нагадаю, поки застосунок відкритий у браузері.'
+      : st === 'denied' ? 'Сповіщення заборонені в браузері — нагадаю повідомленням у застосунку, поки він відкритий.'
+      : st === 'unsupported' ? 'Системні сповіщення тут недоступні — нагадаю повідомленням у застосунку, поки він відкритий.'
+      : 'Дозвольте сповіщення, щоб нагадування зʼявлялося й поза вкладкою (поки застосунок відкритий).';
+  }
+  $('#planTime').addEventListener('input', updateRemindField);
+  $('#planTime').addEventListener('change', updateRemindField);
+  $('#planRemind').addEventListener('change', () => {
+    updateRemindField();
+    // дозвіл просимо саме тут — у відповідь на дію користувача
+    if (+$('#planRemind').value && notifyState() === 'default'){
+      try { Promise.resolve(Notification.requestPermission()).then(updateRemindField); } catch(_){}
+    }
+  });
+
+  const eventMs = t => { const [h, m] = t.time.split(':').map(Number); const d = parse(t.date); d.setHours(h, m, 0, 0); return d.getTime(); };
+  let remindTimer = 0;
+  function checkReminders(){
+    clearTimeout(remindTimer);
+    const now = Date.now(); let next = Infinity, changed = false;
+    tasks.forEach(t => {
+      if (!t.time || !t.remind || t.done || t.reminded) return;   // виконані, без часу чи вже нагадані — нічого планувати
+      const at = eventMs(t) - t.remind * 60000;
+      if (at > now){ next = Math.min(next, at); return; }
+      t.reminded = true; changed = true;
+      if (eventMs(t) > now - 3600000) fireReminder(t);          // давно пропущені (понад годину) мовчки гасимо
+    });
+    if (changed) try { localStorage.setItem(STORE, JSON.stringify(tasks)); } catch(e) {}
+    if (next < Infinity) remindTimer = setTimeout(checkReminders, Math.min(next - now, 30000) + 40);
+  }
+  const remindLabel = m => m === 60 ? '1 годину' : `${m} хв`;
+  async function systemNotify(title, body, tag){
+    if (notifyState() !== 'granted') return false;
+    try {   // Android/Chrome вимагає показ через service worker
+      const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+      if (reg && reg.showNotification){ await reg.showNotification(title, {body, tag, vibrate: [120, 60, 120]}); return true; }
+    } catch(_){}
+    try { new Notification(title, {body, tag}); return true; } catch(_){ return false; }
+  }
+  let toastTimer = 0;
+  function showToast(t, body){
+    const el = $('#toast');
+    $('#toastTitle').textContent = 'Нагадування'; $('#toastText').textContent = body;
+    el.hidden = false; void el.offsetWidth; el.classList.add('show');
+    el.onclick = () => { hideToast(); select(t.date); go(0); };
+    clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, 9000);
+  }
+  function hideToast(){ const el = $('#toast'); el.classList.remove('show'); setTimeout(() => { if (!el.classList.contains('show')) el.hidden = true; }, 400); }
+  function fireReminder(t){
+    const body = `Через ${remindLabel(t.remind)}: ${t.text} (${t.time})`;
+    systemNotify('Мій МЯУдень', body, 'plan-' + t.id);
+    showToast(t, body);
+    haptic('done');
+    $('#live').textContent = 'Нагадування: ' + body;
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkReminders(); });
+  window.addEventListener('focus', checkReminders);
+  // service worker потрібен Android-браузерам для показу сповіщень (працює лише на https/localhost, не з file://)
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+  // режим навігації: клавіатура чи вказівник (дотик/миша) — від нього залежить показ рамки фокуса
+  document.addEventListener('keydown', e => { if (e.key === 'Tab' || e.key.startsWith('Arrow') || e.key === 'Enter' || e.key === ' ') document.documentElement.classList.add('kbd'); }, true);
+  document.addEventListener('pointerdown', () => document.documentElement.classList.remove('kbd'), true);
   scrim.addEventListener('click', closeSheet);
   $('#cancelBtn').addEventListener('click', closeSheet);
   $('#planText').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sheet.requestSubmit(); } });
@@ -1160,8 +1343,14 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     if (!text){ $('#planErr').hidden = false; $('#planText').focus(); return; }
     const date = $('#planDate').value || state.selected;
     const time = $('#planTime').value || '';
-    if (editing){ Object.assign(editing, {text, date, time}); $('#live').textContent = 'План змінено'; }
-    else { const t = {id:uid(), date, text, time, done:false}; tasks.push(t); justAdded = t.id; $('#live').textContent = 'План додано'; }
+    const remind = time ? +$('#planRemind').value || 0 : 0;   // нагадування лише для плану з часом
+    if (editing){
+      // змінилися день, час чи нагадування — нагадування планується заново
+      const changed = editing.date !== date || (editing.time || '') !== time || (editing.remind || 0) !== remind;
+      Object.assign(editing, {text, date, time, remind}); if (changed) editing.reminded = false;
+      $('#live').textContent = 'План змінено';
+    }
+    else { const t = {id:uid(), date, text, time, remind, reminded:false, done:false}; tasks.push(t); justAdded = t.id; $('#live').textContent = 'План додано'; }
     save();
     state.selected = date;
     const d = parse(date); state.cursor = new Date(d.getFullYear(), d.getMonth(), 1);
@@ -1437,6 +1626,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
   // після завантаження шрифту ширина тексту змінюється — перемальовуємо подряпини
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => renderAll());
   renderAll();
+  checkReminders();
   // повторний запуск: без привітання, одразу на сьогоднішній день
   if (welcomeSeen()) enterApp(true);
 })();

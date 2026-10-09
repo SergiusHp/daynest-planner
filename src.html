@@ -68,7 +68,13 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .day-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3)}
 /* заголовок дня — єдиний найбільший елемент; дата під ним — тихий підпис */
 .day-head .title-lg{font-size:26px;line-height:32px;letter-spacing:-.2px}
-.day-head .sun{width:50px;height:50px;flex:none;margin:-8px -6px 0 0;animation:spin 40s linear infinite}
+/* сонце — невидима кнопка «на сьогодні»: розмір, місце й анімація картинки ті самі, лише ширша зона дотику */
+.sun-btn{position:relative;flex:none;width:50px;height:50px;margin:-8px -6px 0 0;padding:0;border:0;background:none;box-shadow:none;
+  border-radius:50%;-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
+.sun-btn::after{content:"";position:absolute;inset:-6px}
+.sun-btn:hover,.sun-btn:active{background:none;box-shadow:none}
+.sun-btn:focus{outline:none}
+.day-head .sun{display:block;width:50px;height:50px;animation:spin 40s linear infinite;pointer-events:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .day .date{margin-top:var(--space-1);font-size:14px;line-height:20px;text-transform:none}
 .day .date::first-letter{text-transform:uppercase}
@@ -115,7 +121,12 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 
 .cat-zone{position:relative;flex:none}
 .cat-zone .scene{width:100%;height:auto;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 16%);mask-image:linear-gradient(to bottom,transparent 0,#000 16%)}
-.cat-btn{position:absolute;left:33%;width:54%;top:2%;bottom:6%;border-radius:40% 40% 18% 18%}
+.cat-btn{position:absolute;left:33%;width:54%;top:2%;bottom:6%;border-radius:40% 40% 18% 18%;
+  background:transparent;border:0;padding:0;box-shadow:none;outline:none;-webkit-appearance:none;appearance:none;
+  -webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.cat-btn:hover,.cat-btn:active,.cat-btn:focus,.cat-btn.tapped{background:transparent;border:0;box-shadow:none;outline:none}
+/* рамка фокуса — лише при навігації з клавіатури (клас kbd ставиться на <html> після натискання клавіші) */
+.kbd .cat-btn:focus-visible,.kbd .sun-btn:focus-visible{outline:3px solid var(--brown);outline-offset:2px}
 .cat-btn:active + .tap,.cat-btn.tapped + .tap{animation:tap .5s ease}
 .tap{position:absolute;left:58%;top:4%;width:30px;opacity:0;pointer-events:none}
 @keyframes tap{0%{opacity:0;transform:translateY(8px) scale(.6)}40%{opacity:1}100%{opacity:0;transform:translateY(-26px) scale(1)}}
@@ -273,6 +284,20 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
   padding:var(--space-3) var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom,0px));
   transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
 .plan-sheet.open{transform:none}
+/* шапка шторки (котик + «Новий план») — зона, за яку шторку тягнуть вниз, щоб закрити */
+.sheet-head{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;margin:0 calc(var(--space-6) * -1);padding:0 var(--space-6);padding-bottom:var(--space-1)}
+.sheet-head:active{cursor:grabbing}
+.plan-sheet.dragging{transition:none}
+#planRemind{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:36px;
+  background:#fffaf0 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%235f2507' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center}
+.remind-note{font-size:12px;line-height:16px;font-weight:600;color:var(--ink-muted)}
+/* повідомлення-нагадування всередині застосунку */
+.toast{position:absolute;left:var(--space-4);right:var(--space-4);top:calc(var(--space-4) + env(safe-area-inset-top,0px));z-index:30;display:flex;flex-direction:column;gap:2px;text-align:left;
+  padding:12px 16px;border-radius:var(--r-md);background:#fffaf0;border:2.5px solid var(--brown);box-shadow:0 4px 0 var(--brown);color:var(--ink);
+  transform:translateY(-160%);opacity:0;transition:transform .4s cubic-bezier(.34,1.4,.64,1),opacity .25s ease}
+.toast.show{transform:none;opacity:1}
+.toast b{font-size:14px;line-height:18px;font-weight:800;color:var(--accent)}
+.toast span{font-size:15px;line-height:20px;font-weight:700}
 .grab{width:40px;height:5px;border-radius:var(--r-pill);background:var(--ink-faint);margin:0 auto var(--space-2)}
 .sheet-top{display:flex;align-items:center;gap:var(--space-3)}
 .sheet-top img{width:68px;height:auto;flex:none;margin:-4px 0 -4px -6px}
@@ -325,7 +350,9 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
               <h1 class="title-lg" id="dayTitle">Сьогоднішні справи</h1>
               <p class="caption date" id="dayDate"></p>
             </div>
-            <img class="sun" src="{{sun}}" alt="">
+            <button class="sun-btn" id="sunBtn" type="button" aria-label="Повернутися на сьогодні">
+              <img class="sun" src="{{sun}}" alt="">
+            </button>
           </div>
           <div class="strip" id="strip" role="group" aria-label="Дні тижня"></div>
           <div class="section-head">
@@ -493,10 +520,12 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
 
   <div class="scrim" id="scrim" hidden></div>
   <form class="plan-sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden novalidate>
+    <div class="sheet-head" id="sheetHead">
     <div class="grab" aria-hidden="true"></div>
     <div class="sheet-top">
       <img src="{{catwink}}" alt="">
       <h2 class="title-md" id="sheetTitle">Новий план</h2>
+    </div>
     </div>
     <div class="field">
       <label for="planText">Що плануєш зробити?</label>
@@ -513,6 +542,18 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
         <input class="input" id="planTime" type="time">
       </div>
     </div>
+    <div class="field" id="remindField" hidden>
+      <label for="planRemind">Нагадування</label>
+      <select class="input" id="planRemind">
+        <option value="0">Без нагадування</option>
+        <option value="5">За 5 хвилин</option>
+        <option value="15">За 15 хвилин</option>
+        <option value="30">За 30 хвилин</option>
+        <option value="45">За 45 хвилин</option>
+        <option value="60">За 1 годину</option>
+      </select>
+      <p class="remind-note" id="remindNote" hidden></p>
+    </div>
     <div class="sheet-actions">
       <button class="btn ghost" type="button" id="cancelBtn">Скасувати</button>
       <button class="btn primary" type="submit" id="saveBtn">Додати</button>
@@ -520,5 +561,6 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     <button class="del" type="button" id="deleteBtn" hidden>Видалити план</button>
   </form>
 
+  <button class="toast" id="toast" type="button" hidden><b id="toastTitle"></b><span id="toastText"></span></button>
   <p class="vh" aria-live="polite" id="live"></p>
 </div>
