@@ -183,6 +183,21 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .focus{background:var(--cal-top)}
 .focus-scroll{flex:1;min-height:0;overflow-y:auto;padding:calc(var(--space-8) + 12px) var(--space-6) calc(var(--space-8) + 24px);scrollbar-width:none;
   display:flex;flex-direction:column;gap:var(--space-4)}
+/* кнопка музики: верхній правий кут сторінки «Фокус»; грає — тепла заливка, нота підстрибує, пливуть звукові хвилі */
+.music-btn{position:absolute;top:calc(var(--space-8) + 6px);right:var(--space-4);z-index:3;width:48px;height:48px;border-radius:var(--r-pill);
+  display:grid;place-items:center;background:#fffaf0;border:2.5px solid var(--chip);color:var(--ink-muted);
+  box-shadow:0 3px 0 var(--chip);transition:background .25s ease,color .25s ease,border-color .25s ease,box-shadow .25s ease,transform .15s ease}
+.music-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--chip)}
+.music-btn svg{width:26px;height:26px;overflow:visible}
+.music-btn .slash{opacity:1;transition:opacity .2s ease}
+.music-btn .wave{opacity:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.music-btn.playing{background:var(--accent);color:var(--on-accent);border-color:var(--brown);box-shadow:0 3px 0 var(--brown)}
+.music-btn.playing .slash{opacity:0}
+.music-btn.playing .note{transform-origin:50% 80%;animation:noteBounce 1s ease-in-out infinite}
+.music-btn.playing .wave{animation:noteWave 1.6s ease-out infinite}
+.music-btn.playing .wave.w2{animation-delay:.5s}
+@keyframes noteBounce{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-2.5px) rotate(-8deg)}60%{transform:translateY(0) rotate(7deg)}80%{transform:translateY(-1px) rotate(-3deg)}}
+@keyframes noteWave{0%{opacity:0;transform:translateX(-2px)}25%{opacity:.9}100%{opacity:0;transform:translateX(5px)}}
 .focus-scroll::-webkit-scrollbar{display:none}
 .focus-head{text-align:center}
 .focus-head .caption{margin-top:2px}
@@ -374,6 +389,13 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
       </section>
 
       <section class="page focus" id="pageFocus" aria-label="Фокус">
+        <button class="music-btn" id="musicBtn" type="button" aria-pressed="false" aria-label="Музика вимкнена. Увімкнути" title="Музика">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <g class="note"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="16.5" cy="16" r="2.6" fill="currentColor"/></g>
+            <path class="wave w1" d="M22 8q1.6 2 0 4"/><path class="wave w2" d="M23.6 6.5q2.8 3.5 0 7"/>
+            <path class="slash" d="M3 3l18 18" stroke-width="2.4"/>
+          </svg>
+        </button>
         <div class="focus-scroll">
           <div class="focus-head">
             <h1 class="title-lg">Фокус</h1>
@@ -814,30 +836,33 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     setTimeout(() => { flip(renderAll); busy = false; }, wait);
   }
   function attachSwipe(li, t){
-    let sx = 0, sy = 0, dx = 0, on = false, drag = false, id = null;
+    let sx = 0, sy = 0, dx = 0, on = false, drag = false, id = null, ignored = false;
     li.addEventListener('pointerdown', e => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
-      on = true; drag = false; sx = e.clientX; sy = e.clientY; dx = 0; id = e.pointerId;
+      on = true; drag = false; ignored = false; sx = e.clientX; sy = e.clientY; dx = 0; id = e.pointerId;
     });
     li.addEventListener('pointermove', e => {
-      if (!on || e.pointerId !== id) return;
+      if (!on || ignored || e.pointerId !== id) return;
       const mx = e.clientX - sx, my = e.clientY - sy;
       if (!drag){
-        if (Math.abs(mx) > 8 && Math.abs(mx) > Math.abs(my) * 1.2){ drag = true; li.classList.add('swiping'); try { li.setPointerCapture(id); } catch(_){} }
+        // свайп справа наліво на справі вимкнено: жодної дії; відмічаємо жест, щоб його відпускання не відкрило справу кліком
+        if (mx < -8 && Math.abs(mx) > Math.abs(my) * 1.2){ ignored = true; return; }
+        if (mx > 8 && Math.abs(mx) > Math.abs(my) * 1.2){ drag = true; li.classList.add('swiping'); try { li.setPointerCapture(id); } catch(_){} }
         else if (Math.abs(my) > 10){ on = false; return; }
         else return;
       }
-      dx = mx;
+      dx = Math.max(0, mx);   // лише вправо; рух назад за початкову точку нічого не робить
       li.style.transform = `translateX(${dx * 0.6}px)`;
-      li.style.setProperty('--p', Math.min(1, Math.abs(dx) / SWIPE).toFixed(3));
+      li.style.setProperty('--p', Math.min(1, dx / SWIPE).toFixed(3));
     });
     const up = () => {
+      if (ignored){ ignored = false; on = false; taskSuppress = true; setTimeout(() => taskSuppress = false, 80); return; }
       if (!on) return; on = false;
       if (!drag) return; drag = false;
       taskSuppress = true; setTimeout(() => taskSuppress = false, 80);
       li.classList.remove('swiping');
       li.style.transform = ''; li.style.removeProperty('--p');
-      if (Math.abs(dx) >= SWIPE) toggle(t, li);
+      if (dx >= SWIPE) toggle(t, li);
     };
     li.addEventListener('pointerup', up);
     li.addEventListener('pointercancel', up);
@@ -1232,6 +1257,54 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     } catch(_){}
   }
 
+  // ---------- фонова музика фокусу ----------
+  // Плейлист із двох треків: стартує разом із таймером, далі йде по колу. Кнопка-нота вмикає/вимикає музику, таймер не чіпає.
+  const MUSIC_KEY = 'daynest-music-v1';          // 'off' — користувач сам вимкнув музику, таймер її не запускатиме
+  const TRACKS = ['audio/focus-1.mp3', 'audio/focus-2.mp3'];
+  const bgm = new Audio(); bgm.preload = 'none'; bgm.volume = 0.8;
+  let trackIdx = 0, musicMuted = false, timerMusic = false, fadeId = 0;
+  try { musicMuted = localStorage.getItem(MUSIC_KEY) === 'off'; } catch(_){}
+  const musicBtn = $('#musicBtn');
+  function musicUI(){
+    const on = !bgm.paused;
+    musicBtn.classList.toggle('playing', on);
+    musicBtn.setAttribute('aria-pressed', on);
+    musicBtn.setAttribute('aria-label', on ? 'Музика грає. Вимкнути' : 'Музика вимкнена. Увімкнути');
+  }
+  function musicPlay(){
+    clearInterval(fadeId); bgm.volume = 0.8;
+    if (!bgm.src) bgm.src = TRACKS[trackIdx];
+    const p = bgm.play();
+    // iOS Safari не вважає pointerdown жестом для звуку — повторюємо спробу на наступному pointerup/touchend цього ж дотику
+    if (p && p.catch) p.catch(() => { musicPending = true; musicUI(); });
+  }
+  let musicPending = false;
+  ['pointerup', 'touchend', 'click'].forEach(ev => document.addEventListener(ev, () => {
+    if (!musicPending) return; musicPending = false;
+    if (bgm.paused && !musicMuted && timerMusic && focus.running) musicPlay();
+  }, true));
+  function musicPause(){ clearInterval(fadeId); bgm.pause(); }
+  // плавне затихання наприкінці сесії
+  function musicFadeOut(){
+    if (bgm.paused) return;
+    clearInterval(fadeId);
+    fadeId = setInterval(() => {
+      bgm.volume = Math.max(0, bgm.volume - 0.08);
+      if (bgm.volume <= 0.01){ clearInterval(fadeId); bgm.pause(); bgm.volume = 0.8; }
+    }, 120);
+  }
+  bgm.addEventListener('play', musicUI); bgm.addEventListener('pause', musicUI); bgm.addEventListener('ended', () => {
+    trackIdx = (trackIdx + 1) % TRACKS.length; bgm.src = TRACKS[trackIdx]; musicPlay();
+  });
+  bgm.addEventListener('error', () => musicUI());
+  musicBtn.addEventListener('click', e => {
+    e.stopPropagation(); timerMusic = false;       // тепер музикою керує користувач, а не таймер
+    if (bgm.paused){ musicMuted = false; musicPlay(); haptic('tap'); }
+    else { musicMuted = true; musicPause(); haptic('tap'); }
+    try { localStorage.setItem(MUSIC_KEY, musicMuted ? 'off' : 'on'); } catch(_){}
+    musicUI();
+  });
+
   function setMinutes(m){
     m = Math.max(1, Math.min(60, Math.round(m)));
     if (m === focus.minutes && focus.remaining === m*60) return;
@@ -1301,7 +1374,10 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     if (focus.running){
       focus.running = false; clearInterval(focus.timer);
       focus.remaining = Math.max(0, (focus.endAt - Date.now()) / 1000);
+      if (timerMusic) musicPause();     // пауза таймера — пауза музики, яку запустив таймер
     } else {
+      // старт (виклик іде з жесту користувача, тож браузер дозволяє звук): грає музика, якщо її не вимкнули кнопкою
+      if (bgm.paused && !musicMuted){ timerMusic = true; musicPlay(); }
       try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume && audio.resume(); } catch(_){}
       if (focus.remaining <= 0) focus.remaining = focus.minutes*60;
       dial.classList.remove('done', 'ticking'); focus.finished = false; clearTimeout(focus.back);
@@ -1321,6 +1397,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     dial.classList.remove('done'); void dial.getBoundingClientRect(); dial.classList.add('done');
     chime();
     haptic('done');
+    if (timerMusic){ musicFadeOut(); timerMusic = false; }   // сесію завершено — музика затихає
     $('#live').textContent = 'Фокус завершено';
     setStatus();
   }
@@ -1328,6 +1405,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
   $('#resetBtn').addEventListener('click', () => {
     focus.running = false; clearInterval(focus.timer); clearTimeout(focus.back); focus.finished = false;
     focus.remaining = focus.minutes*60; dial.classList.remove('done', 'ticking');
+    if (timerMusic){ musicPause(); timerMusic = false; }
     drawDial(); setStatus();
   });
 
