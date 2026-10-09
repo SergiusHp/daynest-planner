@@ -630,6 +630,9 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
       li.dataset.style = style;
       li.dataset.scratchMs = addScratch(li.querySelector('.label'), t.id, style);
     });
+    // нова справа з'являється внизу списку — прокручуємо до неї, щоб вона була видна
+    const fresh = ul.querySelector('.task.pop');
+    if (fresh){ const box = $('#taskScroll'); requestAnimationFrame(() => { box.scrollTo({top: fresh.offsetTop - box.offsetTop - box.clientHeight + fresh.offsetHeight + 24, behavior:'smooth'}); }); }
     justAdded = null;
     $('#emptyDay').hidden = list.length > 0;
     $('#swipeHint').hidden = list.length === 0;
