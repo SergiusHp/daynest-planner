@@ -133,17 +133,6 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .cat-btn:active + .tap,.cat-btn.tapped + .tap{animation:tap .5s ease}
 .tap{position:absolute;left:58%;top:4%;width:30px;opacity:0;pointer-events:none}
 @keyframes tap{0%{opacity:0;transform:translateY(8px) scale(.6)}40%{opacity:1}100%{opacity:0;transform:translateY(-26px) scale(1)}}
-/* комікс-бульбашка біля котика: вискакує «попом» і сама зникає через кілька секунд */
-.bubble{position:absolute;left:var(--space-4);top:-48px;z-index:1;max-width:146px;padding:8px 12px;
-  background:#fffaf0;border:2.5px solid var(--brown);border-radius:22px 22px 22px 8px;box-shadow:3px 3px 0 var(--brown);
-  font-size:13px;line-height:17px;font-weight:800;color:var(--ink);pointer-events:none;
-  opacity:0;transform:scale(.4) rotate(-8deg);transform-origin:88% 120%;
-  transition:opacity .35s ease, transform .5s cubic-bezier(.34,1.56,.64,1)}
-.bubble.show{opacity:1;transform:scale(1) rotate(-3deg)}
-/* хвостик бульбашки: обвідка (before) і заливка (after), нахилені до котика */
-.bubble::before,.bubble::after{content:"";position:absolute;width:0;height:0;border-style:solid;transform:skewX(-46deg);transform-origin:top}
-.bubble::before{right:16px;bottom:-24px;border-width:24px 3px 0 17px;border-color:var(--brown) transparent transparent transparent}
-.bubble::after{right:20.5px;bottom:-15px;border-width:16px 2px 0 10px;border-color:#fffaf0 transparent transparent transparent}
 /* навігаційна стрілка: лише іконка, напівпрозора, мʼяко «хвилюється» */
 .hint{position:absolute;right:var(--space-3);bottom:4px;width:44px;height:44px;display:grid;place-items:center;
   border-radius:var(--r-pill);color:var(--brown);opacity:.6;transition:opacity .2s ease}
@@ -192,10 +181,7 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .events li .t{flex:none;font-size:14px;color:var(--ink-muted)}
 .events li.done::before{background:#fef5e3;border-color:#d1b48d}
 .events li.done{opacity:.5}
-.swipe-hint{margin-top:var(--space-4);font-size:12px;line-height:16px;color:var(--ink-muted)}
 /* підказка про свайп зникає сама через 5 секунд після старту */
-.swipe-hint{max-height:60px;overflow:hidden;transition:opacity .5s ease, max-height .45s ease .35s, margin-top .45s ease .35s}
-.swipe-hint.gone{opacity:0;max-height:0;margin-top:0}
 .group-label{font-size:12px;line-height:16px;font-weight:800;color:var(--ink-muted);margin-top:var(--space-4);letter-spacing:.02em}
 
 /* ---------- focus ---------- */
@@ -268,27 +254,6 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .sessions img{width:18px;height:18px}
 
 
-/* ---------- підказка про свайп (перший запуск) ---------- */
-.coach{position:absolute;inset:0;z-index:8;display:flex;align-items:flex-end;justify-content:center;
-  padding:0 var(--space-6) 140px;background:rgba(43,26,13,.22);opacity:0;transition:opacity .35s ease;pointer-events:none}
-.coach.show{opacity:1}
-.coach-card{width:100%;max-width:300px;background:#fffaf0;border:2.5px solid var(--brown);border-radius:22px;box-shadow:4px 4px 0 var(--brown);
-  padding:var(--space-4) var(--space-4) var(--space-3);text-align:center;transform:translateY(16px) scale(.92);
-  transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
-.coach.show .coach-card{transform:none}
-.coach-card p{font-size:16px;line-height:22px;font-weight:800;color:var(--ink);margin-top:var(--space-2)}
-.coach-skip{display:block;margin-top:var(--space-2);font-size:12px;line-height:16px;font-weight:700;color:var(--ink-muted)}
-.coach-demo{position:relative;height:56px;margin:0 auto;width:200px}
-/* пунктирний слід свайпу зі стрілкою вліво */
-.coach-trail{position:absolute;left:18px;right:18px;top:27px;border-top:3px dashed var(--chip)}
-.coach-trail::before{content:"";position:absolute;left:-4px;top:-8.5px;width:11px;height:11px;border-left:3px solid var(--accent);
-  border-bottom:3px solid var(--accent);transform:rotate(45deg);border-radius:2px}
-.coach-paw{position:absolute;top:6px;left:50%;width:44px;height:44px;margin-left:-22px;animation:coachSwipe 1.6s cubic-bezier(.45,0,.3,1) infinite}
-@keyframes coachSwipe{
-  0%{transform:translateX(70px) scale(.9);opacity:0}
-  15%{transform:translateX(64px) scale(1);opacity:1}
-  70%{transform:translateX(-66px) scale(1) rotate(-8deg);opacity:1}
-  88%,100%{transform:translateX(-72px) scale(.85);opacity:0}}
 
 /* ---------- pager dots ---------- */
 .dots{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
@@ -340,6 +305,234 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
 .btn.primary{background:var(--accent);color:var(--on-accent);box-shadow:0 3px 0 #c95a1d}
 .del{display:block;margin:var(--space-3) auto 0;font-size:14px;font-weight:800;color:#b24a12;padding:6px 10px;border-radius:var(--r-sm)}
 
+/* ---------- онбординг ---------- */
+/* Один крок на екрані: велика анімована демонстрація (300×400, масштабується під екран), інструкція, прогрес і кнопки.
+   Хореографія кожного демо: жест → відповідь інтерфейсу → пауза → м'яке скидання; анімуються лише transform та opacity. */
+.onboard{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + var(--space-2)) var(--space-6) calc(env(safe-area-inset-bottom,0px) + var(--space-6));
+  background:linear-gradient(180deg,var(--cal-top) 0%,var(--day) 46%,var(--day) 100%);
+  opacity:0;transition:opacity .45s ease}
+.onboard.show{opacity:1}
+.ob-top{flex:none;height:48px;display:flex;align-items:center;justify-content:space-between}
+.ob-progress{font-size:13px;line-height:18px;font-weight:800;color:var(--ink-muted);font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.ob-skip{min-height:44px;min-width:44px;padding:0 2px 0 var(--space-4);font-size:15px;line-height:20px;font-weight:800;color:var(--ink-soft);border-radius:var(--r-sm)}
+.ob-skip[aria-hidden="true"]{visibility:hidden}
+.ob-stage{position:relative;flex:1;min-height:0;margin-top:var(--space-2)}
+/* тепле сяйво за карткою — легка глибина без зайвих деталей */
+.ob-glow{position:absolute;left:50%;top:50%;width:min(92%,360px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(253,209,149,.55) 0%,rgba(253,209,149,0) 68%);pointer-events:none}
+.ob-fit{position:absolute;left:50%;top:50%;width:300px;height:400px;transform:translate(-50%,-50%) scale(var(--k,1))}
+.ob-step{position:absolute;inset:0;opacity:0;transform:translateX(40px);pointer-events:none;
+  transition:opacity .42s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.ob-step.active{opacity:1;transform:none}
+.ob-step.past{transform:translateX(-40px)}
+.ob-copy{flex:none;margin-top:var(--space-6);min-height:84px;display:flex;align-items:flex-start;justify-content:center}
+.ob-copy p{max-width:17em;text-align:center;font-size:21px;line-height:28px;font-weight:800;color:var(--ink);text-wrap:balance;
+  transition:opacity .2s ease,transform .2s ease}
+.ob-copy p.swap{opacity:0;transform:translateY(6px)}
+.ob-actions{flex:none;margin-top:var(--space-4)}
+.ob-actions .btn{min-height:54px}
+@media (max-height:700px){
+  .ob-copy{margin-top:var(--space-4);min-height:78px}
+  .ob-copy p{font-size:19px;line-height:26px}
+}
+
+/* картка-мініатюра екрана застосунку */
+.ob-card{position:absolute;inset:0;overflow:hidden;border-radius:30px;background:var(--day);
+  box-shadow:0 0 0 2px #f4d6aa,0 7px 0 #efc994,0 28px 44px -22px rgba(95,37,7,.42)}
+.m-head{position:absolute;left:20px;top:24px;width:210px}
+.m-titles{position:relative;height:24px}
+.m-t{position:absolute;left:0;top:0;white-space:nowrap;font-size:18px;line-height:24px;font-weight:800;color:var(--ink)}
+.m-dates{position:relative;height:16px;margin-top:4px}
+.m-d{position:absolute;left:0;top:0;white-space:nowrap;font-size:11px;line-height:16px;font-weight:700;color:var(--ink-muted)}
+.m-d::first-letter{text-transform:uppercase}
+.m-sun-wrap{position:absolute;left:236px;top:16px;width:46px;height:46px}
+.m-sun{width:100%;height:100%;animation:spin 40s linear infinite}
+.m-strip{position:absolute;left:20px;top:88px;width:260px;height:44px;display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.m-chip{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:9px;
+  background:var(--chip);color:var(--ink)}
+.m-chip i{font-style:normal;font-size:9px;line-height:11px;font-weight:700}
+.m-chip b{font-size:13px;line-height:15px;font-weight:800}
+.m-chip.sel{background:var(--accent);color:var(--on-accent)}
+.m-chip.today:not(.sel)::after{content:"";position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.m-strip .m-chip.ghost{background:transparent}           /* у кроці 1 фон чипів малює окремий шар, щоб «таблетка» ковзала між ними */
+.m-strip .m-base{position:absolute;inset:0;display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.m-strip .m-base span{border-radius:9px;background:var(--chip)}
+.m-pill{position:absolute;left:0;top:0;width:calc((100% - 30px) / 7);height:100%;border-radius:9px;background:var(--accent);
+  transform:translateX(calc(var(--to) * (100% + 5px)))}
+.m-ring{position:absolute;left:0;top:0;width:calc((100% - 30px) / 7);height:100%;border-radius:11px;box-shadow:0 0 0 3px var(--accent);
+  opacity:0;transform:translateX(calc(var(--to) * (100% + 5px)))}
+.m-rows{position:absolute;left:20px;right:20px;top:148px;list-style:none;margin:0;padding:0}
+.m-rows li{display:flex;align-items:center;gap:10px;height:30px;font-size:13px;line-height:18px;font-weight:700;color:var(--ink);white-space:nowrap}
+.m-rows li+li{border-top:1px solid rgba(134,102,74,.16)}
+.m-rows i{flex:none;width:15px;height:15px;border-radius:4px;border:2px solid var(--brown);background:#fdf4e3}
+.m-scene{position:absolute;left:0;bottom:0;width:300px;height:156px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 16%);mask-image:linear-gradient(to bottom,transparent 0,#000 16%)}
+
+/* рука, дотик, хвиля */
+.hand-wrap{position:absolute;left:calc(var(--x) - 23.5px);top:calc(var(--y) - 3px);width:58px;height:76px;opacity:0;
+  transform-origin:23.5px 3px;filter:drop-shadow(0 4px 4px rgba(95,37,7,.18))}
+.hand{display:block;width:58px;height:76px;overflow:visible}
+.touch{position:absolute;left:10.5px;top:-10px;width:26px;height:26px;border-radius:50%;background:var(--accent);opacity:0}
+.ripple{position:absolute;left:229px;top:9px;width:60px;height:60px;border-radius:50%;border:3px solid var(--accent);opacity:0;transform:scale(.3)}
+
+/* ===== крок 1 ===== */
+.s1{--d:4.8s}
+.s1 .hand-wrap{--x:259px;--y:40px}
+.s1 .m-titles .tb,.s1 .m-dates .tb,.s1 .m-rows.tb{opacity:0}
+.s1 .m-pill{transform:translateX(calc(var(--from) * (100% + 5px)))}
+.s1 .m-chip.from{color:var(--on-accent)}
+.s1.run .hand-wrap{animation:obTap1 var(--d) infinite}
+.s1.run .ripple{animation:obRipple1 var(--d) infinite}
+.s1.run .m-sun-wrap{animation:obSun1 var(--d) infinite}
+.s1.run .m-pill{animation:obPill1 var(--d) infinite}
+.s1.run .m-chip.from{animation:obFromTxt var(--d) infinite}
+.s1.run .m-chip.to{animation:obToTxt var(--d) infinite}
+.s1.run .m-ring{animation:obRing1 var(--d) infinite}
+.s1.run .ta{animation:obOut1 var(--d) infinite}
+.s1.run .tb{animation:obIn1 var(--d) infinite}
+@keyframes obTap1{
+  0%{opacity:0;transform:translate(44px,70px) rotate(10deg);animation-timing-function:cubic-bezier(.2,.7,.3,1)}
+  13%{opacity:1;transform:translate(5px,9px) rotate(2deg);animation-timing-function:ease-in-out}
+  18%{opacity:1;transform:translate(0,-5px) scale(1.04)}                       /* передчуття */
+  22%{opacity:1;transform:translate(0,1px) scale(.9);animation-timing-function:ease-out}  /* натискання */
+  29%{opacity:1;transform:translate(0,0) scale(1)}
+  50%{opacity:1;transform:translate(8px,16px) rotate(3deg);animation-timing-function:ease-in}
+  62%,100%{opacity:0;transform:translate(40px,64px) rotate(10deg)}}
+@keyframes obRipple1{0%,21%{opacity:0;transform:scale(.3)}23%{opacity:.75;transform:scale(.42)}46%,100%{opacity:0;transform:scale(1.6)}}
+@keyframes obSun1{0%,21%{transform:scale(1)}24%{transform:scale(.92)}31%{transform:scale(1.05)}38%,100%{transform:scale(1)}}
+@keyframes obPill1{
+  0%,25%{opacity:1;transform:translateX(calc(var(--from) * (100% + 5px)));animation-timing-function:cubic-bezier(.3,0,.15,1)}
+  38%{opacity:1;transform:translateX(calc(var(--to) * (100% + 5px) + var(--dir) * 3px));animation-timing-function:ease-out}  /* легкий «перельот» */
+  42%,85%{opacity:1;transform:translateX(calc(var(--to) * (100% + 5px)))}
+  90%{opacity:0;transform:translateX(calc(var(--to) * (100% + 5px)))}
+  91%{opacity:0;transform:translateX(calc(var(--from) * (100% + 5px)))}
+  97%,100%{opacity:1;transform:translateX(calc(var(--from) * (100% + 5px)))}}
+@keyframes obFromTxt{0%,27%{color:var(--on-accent)}33%,94%{color:var(--ink)}98%,100%{color:var(--on-accent)}}
+@keyframes obToTxt{0%,33%{color:var(--ink)}38%,86%{color:var(--on-accent)}90%,100%{color:var(--ink)}}
+@keyframes obRing1{0%,40%{opacity:0;transform:translateX(calc(var(--to) * (100% + 5px))) scale(.92)}
+  45%{opacity:1;transform:translateX(calc(var(--to) * (100% + 5px))) scale(1)}
+  64%,100%{opacity:0;transform:translateX(calc(var(--to) * (100% + 5px))) scale(1.28)}}
+@keyframes obOut1{0%,27%{opacity:1}34%,87%{opacity:0}93%,100%{opacity:1}}
+@keyframes obIn1{0%,29%{opacity:0}36%,85%{opacity:1}91%,100%{opacity:0}}
+
+/* ===== крок 2 ===== */
+.s2{--d:4.6s}
+.m-screen{position:absolute;inset:0}
+.m-track{position:absolute;left:0;top:0;width:600px;height:100%;display:flex}
+.m-page{position:relative;flex:none;width:300px;height:100%}
+.m-cal{background:var(--cal-top)}
+.m-seg{position:absolute;left:50%;top:22px;transform:translateX(-50%);display:flex;gap:3px;padding:3px;border-radius:var(--r-pill);background:var(--tog)}
+.m-seg span{padding:4px 11px;border-radius:var(--r-pill);font-size:10.5px;line-height:13px;font-weight:800;color:var(--ink-soft)}
+.m-seg .on{background:var(--accent);color:var(--on-accent)}
+.m-month{position:absolute;left:20px;top:58px;font-size:16px;line-height:22px;font-weight:800;color:var(--ink)}
+.m-grid{position:absolute;left:20px;top:88px;width:260px;display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px}
+.m-grid span{height:20px;display:grid;place-items:center;font-size:10px;font-weight:700;color:var(--ink)}
+.m-grid span.out{color:var(--ink-faint)}
+.m-grid span.today b{width:18px;height:18px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:var(--on-accent);font-weight:800}
+.m-grid b{font-weight:inherit}
+.m-list-t{position:absolute;left:20px;top:232px;font-size:12px;line-height:16px;font-weight:800;color:var(--ink)}
+.m-cal .m-rows{top:254px}
+.m-dots{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:5px}
+.m-dots span{width:6px;height:6px;border-radius:50%;background:var(--ink-faint)}
+.m-dots em{position:absolute;left:0;top:0;width:6px;height:6px;border-radius:50%;background:var(--brown);box-shadow:0 0 0 1px var(--brown)}
+.trail{position:absolute;left:62px;top:199px;width:174px;height:0;border-top:3px dashed var(--accent);opacity:0;transform-origin:100% 50%;transform:scaleX(0)}
+.trail::before{content:"";position:absolute;left:-2px;top:-9.5px;width:11px;height:11px;border-left:3px solid var(--accent);border-bottom:3px solid var(--accent);
+  border-radius:2px;transform:rotate(45deg)}
+.s2 .hand-wrap{--x:236px;--y:200px}
+.s2.run .hand-wrap{animation:obDrag2 var(--d) infinite}
+.s2.run .touch{animation:obTouch2 var(--d) infinite}
+.s2.run .m-track{animation:obTrack2 var(--d) infinite}
+.s2.run .m-screen{animation:obScreen2 var(--d) infinite}
+.s2.run .m-dots em{animation:obDot2 var(--d) infinite}
+.s2.run .trail{animation:obTrail2 var(--d) infinite}
+@keyframes obDrag2{
+  0%{opacity:0;transform:translate(26px,44px) rotate(8deg);animation-timing-function:cubic-bezier(.2,.7,.3,1)}
+  11%{opacity:1;transform:translate(0,0) rotate(0);animation-timing-function:ease-in-out}
+  16%{opacity:1;transform:translate(3px,-4px) scale(1.04)}                         /* передчуття: трохи вправо й угору */
+  21%{opacity:1;transform:translate(0,1px) scale(.92);animation-timing-function:cubic-bezier(.45,0,.35,1)}
+  52%{opacity:1;transform:translate(-170px,1px) scale(.92) rotate(-6deg);animation-timing-function:ease-out}
+  59%{opacity:1;transform:translate(-178px,-6px) scale(1) rotate(-6deg);animation-timing-function:ease-in}
+  70%,100%{opacity:0;transform:translate(-196px,-34px) scale(1) rotate(-10deg)}}
+@keyframes obTouch2{0%,20%{opacity:0;transform:scale(.4)}23%,50%{opacity:.28;transform:scale(1)}57%,100%{opacity:0;transform:scale(1.5)}}
+@keyframes obTrack2{
+  0%,21%{transform:translateX(0);animation-timing-function:cubic-bezier(.45,0,.35,1)}
+  52%{transform:translateX(-170px);animation-timing-function:cubic-bezier(.2,.75,.25,1)}   /* сторінка йде за пальцем */
+  61%{transform:translateX(-306px);animation-timing-function:ease-in-out}                 /* інерція з невеликим перельотом */
+  67%,89%{transform:translateX(-300px);animation-timing-function:steps(1,end)}
+  90%,100%{transform:translateX(0)}}
+@keyframes obScreen2{0%,84%{opacity:1}89%,91%{opacity:0}98%,100%{opacity:1}}
+@keyframes obDot2{0%,52%{transform:translateX(0);animation-timing-function:cubic-bezier(.3,0,.2,1)}60%,84%{transform:translateX(11px)}89%{opacity:1;transform:translateX(11px)}90%{opacity:0;transform:translateX(0)}96%,100%{opacity:1;transform:translateX(0)}}
+@keyframes obTrail2{0%,21%{opacity:0;transform:scaleX(0);animation-timing-function:cubic-bezier(.45,0,.35,1)}24%{opacity:1}
+  52%{opacity:1;transform:scaleX(1)}68%,100%{opacity:0;transform:scaleX(1)}}
+
+/* ===== крок 3 ===== */
+.s3{--d:5.6s}
+.s3 .m-scene{transform-origin:60% 100%}
+.m-paw{position:absolute;left:176px;top:250px;width:24px;height:24px;opacity:0}
+.m-scrim{position:absolute;inset:0;background:var(--scrim);opacity:0}
+.m-sheet{position:absolute;left:0;right:0;bottom:0;height:198px;padding:8px 18px 0;border-radius:22px 22px 0 0;background:var(--day);
+  box-shadow:0 -6px 18px rgba(95,37,7,.14);transform:translateY(104%)}
+.m-grab{display:block;width:30px;height:4px;margin:0 auto 4px;border-radius:var(--r-pill);background:var(--ink-faint)}
+.m-sheet-top{display:flex;align-items:center;gap:8px}
+.m-sheet-top img{width:58px;height:41px;margin-left:-4px}
+.m-sheet-top b{font-size:16px;line-height:22px;font-weight:800;color:var(--ink)}
+.m-label{display:block;margin-top:6px;font-size:10.5px;line-height:14px;font-weight:800;color:var(--ink-soft)}
+.m-input{position:relative;display:flex;align-items:center;height:42px;margin-top:5px;padding:0 11px;border-radius:11px;border:2px solid var(--accent);background:#fffaf0}
+.m-typed{display:inline-block;white-space:nowrap;font-size:13px;line-height:18px;font-weight:700;color:var(--ink);clip-path:inset(0 100% 0 0)}
+.m-caret{position:absolute;left:11px;top:11px;width:2px;height:16px;border-radius:1px;background:var(--accent)}
+.m-btns{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:12px}
+.m-btns span{display:grid;place-items:center;height:34px;border-radius:var(--r-pill);font-size:12px;font-weight:800;color:var(--ink-soft)}
+.m-btns .add{background:var(--accent);color:var(--on-accent);box-shadow:0 2px 0 #c95a1d}
+.s3 .hand-wrap{--x:184px;--y:326px}
+.s3.run .hand-wrap{animation:obTap3 var(--d) infinite}
+.s3.run .m-scene.cat{animation:obCat3 var(--d) infinite}
+.s3.run .m-paw{animation:obPaw3 var(--d) infinite}
+.s3.run .m-scrim{animation:obScrim3 var(--d) infinite}
+.s3.run .m-sheet{animation:obSheet3 var(--d) infinite}
+.s3.run .m-typed{animation:obType3 var(--d) infinite}
+.s3.run .m-caret{animation:obCaret3 var(--d) infinite,obBlink 1s steps(1) infinite}
+@keyframes obTap3{
+  0%{opacity:0;transform:translate(46px,60px) rotate(10deg);animation-timing-function:cubic-bezier(.2,.7,.3,1)}
+  11%{opacity:1;transform:translate(5px,8px) rotate(2deg);animation-timing-function:ease-in-out}
+  15%{opacity:1;transform:translate(0,-5px) scale(1.04)}
+  19%{opacity:1;transform:translate(0,1px) scale(.9);animation-timing-function:ease-out}
+  25%{opacity:1;transform:translate(0,0) scale(1);animation-timing-function:ease-in}
+  34%,100%{opacity:0;transform:translate(42px,58px) rotate(10deg)}}
+@keyframes obCat3{0%,19%{transform:none}22%{transform:scale(1.015,.975)}28%{transform:scale(.995,1.02) translateY(-2px)}33%,100%{transform:none}}
+@keyframes obPaw3{0%,21%{opacity:0;transform:translateY(6px) scale(.6)}27%{opacity:1;transform:translateY(-6px) scale(1)}40%,100%{opacity:0;transform:translateY(-26px) scale(1)}}
+@keyframes obScrim3{0%,29%{opacity:0}38%,87%{opacity:1}95%,100%{opacity:0}}
+@keyframes obSheet3{
+  0%,30%{transform:translateY(104%);animation-timing-function:cubic-bezier(.2,.8,.25,1)}
+  41%{transform:translateY(-2%);animation-timing-function:ease-in-out}
+  45%,87%{transform:translateY(0);animation-timing-function:cubic-bezier(.5,0,.75,0)}
+  95%,100%{transform:translateY(104%)}}
+@keyframes obType3{0%,48%{clip-path:inset(0 100% 0 0);animation-timing-function:steps(21,end)}70%,96%{clip-path:inset(0 0 0 0);animation-timing-function:steps(1,end)}97%,100%{clip-path:inset(0 100% 0 0)}}
+@keyframes obCaret3{0%,48%{transform:translateX(0);animation-timing-function:steps(21,end)}70%,96%{transform:translateX(var(--tw,150px));animation-timing-function:steps(1,end)}97%,100%{transform:translateX(0)}}
+@keyframes obBlink{0%,55%{opacity:1}56%,100%{opacity:0}}
+
+/* зменшений рух: чіткі статичні кадри замість анімацій */
+@media (prefers-reduced-motion:reduce){
+  .ob-step,.ob-step.past{transform:none}
+  .s1 .hand-wrap,.s3 .hand-wrap{opacity:1;transform:none}
+  .s1 .ripple{opacity:.6;transform:scale(1)}
+  .s1 .m-pill{transform:translateX(calc(var(--to) * (100% + 5px)))}
+  .s1 .m-chip.from{color:var(--ink)} .s1 .m-chip.to{color:var(--on-accent)}
+  .s1 .m-ring{opacity:1}
+  .s1 .m-titles .ta,.s1 .m-dates .ta,.s1 .m-rows.ta{opacity:0}
+  .s1 .m-titles .tb,.s1 .m-dates .tb,.s1 .m-rows.tb{opacity:1}
+  .s2 .hand-wrap{opacity:1;transform:translate(-112px,1px) scale(.92) rotate(-6deg)}
+  .s2 .touch{opacity:.28}
+  .s2 .m-track{transform:translateX(-112px)}
+  .s2 .trail{opacity:1;transform:scaleX(.66)}
+  .s3 .m-sheet{transform:translateY(52%)}                 /* шторка саме «виїжджає» з-під пальця */
+  .s3 .m-scrim{opacity:.55}
+  .s3 .m-typed{clip-path:none}
+  .s3 .m-caret{transform:translateX(var(--tw,150px))}
+  .s3 .m-paw{opacity:1;transform:translateY(-6px)}
+  .s3 .hand-wrap{--y:268px;clip-path:inset(0 0 36px 0)}   /* палець на голові котика, кисть сховалась за шторкою */
+}
+
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -356,6 +549,101 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     <footer>
       <button class="btn" id="startBtn" type="button">Розпочати</button>
     </footer>
+  </section>
+
+  <!-- онбординг: три кроки з анімованими демонстраціями (показується один раз, після привітання) -->
+  <section class="onboard" id="onboard" aria-label="Як користуватися застосунком" hidden>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <!-- мультяшна рука з витягнутим пальцем; кінчик пальця — точка (26, 3) -->
+      <symbol id="obHand" viewBox="0 0 64 84">
+        <g stroke="#5f2507" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M14 68 h34 a4 4 0 0 1 4 4 v11 h-42 v-11 a4 4 0 0 1 4 -4z" fill="#f67a36"/>
+          <path d="M19 42 V10 a7 7 0 0 1 14 0 v22 a5.5 5.5 0 0 1 10.5 1.5 a5.5 5.5 0 0 1 10 2.5 v13 q0 19 -19 19 h-6 q-11 0 -15.5 -9 l-6.5 -13 a5.2 5.2 0 0 1 8.5 -5.8 z" fill="#fffaf0"/>
+          <path d="M33 32 v6 M43.5 33.5 v6" fill="none" stroke-width="2.6"/>
+          <path d="M22.5 8.5 q3.5 -2.5 7 0" fill="none" stroke="#f9a77a" stroke-width="2.2"/>
+        </g>
+      </symbol>
+    </svg>
+
+    <div class="ob-top">
+      <span class="ob-progress" id="obProgress">1/3</span>
+      <button class="ob-skip" id="obSkip" type="button">Пропустити</button>
+    </div>
+
+    <div class="ob-stage" id="obStage" aria-hidden="true">
+      <div class="ob-glow"></div>
+      <div class="ob-fit" id="obFit">
+
+        <!-- крок 1: сонечко повертає на сьогодні -->
+        <div class="ob-step s1" data-step="0">
+          <div class="ob-card">
+            <div class="m-head">
+              <div class="m-titles"><b class="m-t ta" data-k="titleA"></b><b class="m-t tb">Сьогоднішні справи</b></div>
+              <div class="m-dates"><span class="m-d ta" data-k="dateA"></span><span class="m-d tb" data-k="dateB"></span></div>
+            </div>
+            <div class="m-sun-wrap"><img class="m-sun" data-src=".day-head .sun" alt=""></div>
+            <span class="ripple"></span>
+            <div class="m-strip" data-strip="1"></div>
+            <ul class="m-rows ta"><li><i></i>Купити продукти</li><li><i></i>Подзвонити бабусі</li></ul>
+            <ul class="m-rows tb"><li><i></i>Прочитати 10 сторінок</li><li><i></i>Прогулянка з котиком</li><li><i></i>Полити квіти</li></ul>
+            <img class="m-scene" data-src=".cat-zone .scene" alt="">
+          </div>
+          <div class="hand-wrap h1"><svg class="hand"><use href="#obHand"/></svg></div>
+        </div>
+
+        <!-- крок 2: свайп вліво — наступна сторінка -->
+        <div class="ob-step s2" data-step="1">
+          <div class="ob-card">
+            <div class="m-screen">
+              <div class="m-track">
+                <div class="m-page">
+                  <div class="m-head"><div class="m-titles"><b class="m-t">Сьогоднішні справи</b></div><div class="m-dates"><span class="m-d" data-k="dateB"></span></div></div>
+                  <div class="m-sun-wrap"><img class="m-sun" data-src=".day-head .sun" alt=""></div>
+                  <div class="m-strip" data-strip="0"></div>
+                  <ul class="m-rows"><li><i></i>Прочитати 10 сторінок</li><li><i></i>Прогулянка з котиком</li><li><i></i>Полити квіти</li></ul>
+                  <img class="m-scene" data-src=".cat-zone .scene" alt="">
+                </div>
+                <div class="m-page m-cal">
+                  <div class="m-seg"><span>Тиждень</span><span class="on">Місяць</span></div>
+                  <b class="m-month" data-k="month"></b>
+                  <div class="m-grid" id="obGrid"></div>
+                  <p class="m-list-t" data-k="listTitle"></p>
+                  <ul class="m-rows"><li><i></i>Прочитати 10 сторінок</li><li><i></i>Полити квіти</li></ul>
+                </div>
+              </div>
+            </div>
+            <div class="m-dots"><span></span><span></span><span></span><em></em></div>
+          </div>
+          <span class="trail"></span>
+          <div class="hand-wrap h2"><span class="touch"></span><svg class="hand"><use href="#obHand"/></svg></div>
+        </div>
+
+        <!-- крок 3: котик відкриває «Новий план» -->
+        <div class="ob-step s3" data-step="2">
+          <div class="ob-card">
+            <div class="m-head"><div class="m-titles"><b class="m-t">Сьогоднішні справи</b></div><div class="m-dates"><span class="m-d" data-k="dateB"></span></div></div>
+            <div class="m-sun-wrap"><img class="m-sun" data-src=".day-head .sun" alt=""></div>
+            <div class="m-strip" data-strip="0"></div>
+            <ul class="m-rows"><li><i></i>Прогулянка з котиком</li></ul>
+            <img class="m-scene cat" data-src=".cat-zone .scene" alt="">
+            <img class="m-paw" data-src=".cat-zone .tap" alt="">
+            <span class="m-scrim"></span>
+            <div class="m-sheet">
+              <span class="m-grab"></span>
+              <div class="m-sheet-top"><img data-src=".sheet-top img" alt=""><b>Новий план</b></div>
+              <span class="m-label">Що плануєш зробити?</span>
+              <div class="m-input"><span class="m-typed" id="obTyped">Прочитати 10 сторінок</span><span class="m-caret"></span></div>
+              <div class="m-btns"><span>Скасувати</span><span class="add">Додати</span></div>
+            </div>
+          </div>
+          <div class="hand-wrap h3"><svg class="hand"><use href="#obHand"/></svg></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="ob-copy"><p id="obText" aria-live="polite">Натисни на сонечко, щоб повернутися до сьогоднішнього дня.</p></div>
+    <div class="ob-actions"><button class="btn primary" id="obNext" type="button">Далі</button></div>
   </section>
 
   <div class="main" id="main" aria-hidden="true">
@@ -379,13 +667,11 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
           </div>
           <div class="task-scroll" id="taskScroll">
           <ul class="tasks" id="tasks"></ul>
-          <p class="swipe-hint" id="swipeHint">Проведи по справі вправо, щоб закреслити. Ще раз — щоб повернути.</p>
           <p class="empty" id="emptyDay" hidden>На цей день ще немає планів. Натисни на котика, щоб додати перший.</p>
           </div>
         </div>
         <div class="cat-zone">
           <img class="scene" src="data:image/webp;base64,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" alt="">
-          <p class="bubble" id="catBubble" aria-hidden="true">Натисни на мене, щоб додати план</p>
           <button class="cat-btn" id="catBtn" type="button" aria-label="Додати план"></button>
           <img class="tap" src="data:image/webp;base64,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" alt="">
           <button class="hint" type="button" id="toCal" aria-label="Відкрити тиждень і місяць">
@@ -531,16 +817,6 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     </nav>
 
     <!-- підказка про свайп: показується лише при першому запуску -->
-    <div class="coach" id="coach" hidden>
-      <div class="coach-card" role="status">
-        <div class="coach-demo" aria-hidden="true">
-          <span class="coach-trail"></span>
-          <img class="coach-paw" src="data:image/webp;base64,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" alt="">
-        </div>
-        <p>Свайпни вліво, щоб відкрити тиждень, місяць і фокус</p>
-        <span class="coach-skip">Торкнись, щоб закрити</span>
-      </div>
-    </div>
   </div>
 
   <div class="scrim" id="scrim" hidden></div>
@@ -686,7 +962,6 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     if (fresh){ const box = $('#taskScroll'); requestAnimationFrame(() => { box.scrollTo({top: fresh.offsetTop - box.offsetTop - box.clientHeight + fresh.offsetHeight + 24, behavior:'smooth'}); }); }
     justAdded = null;
     $('#emptyDay').hidden = list.length > 0;
-    $('#swipeHint').hidden = list.length === 0;
     const done = list.filter(t => t.done).length;
     $('#dayCount').textContent = list.length ? `${done} з ${list.length} виконано` : '';
   }
@@ -1071,56 +1346,122 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     const w = $('#welcome');
     w.hidden = true; w.classList.remove('leaving');
     $('#main').setAttribute('aria-hidden','false');
-    // перший запуск: спершу підказка про свайп, потім бульбашка котика
-    if (coachSeen()) showBubble(); else showCoach();
-    // текст «Проведи по справі…» ховаємо через 5 секунд
-    setTimeout(() => $('#swipeHint').classList.add('gone'), 5000);
   }
   $('#startBtn').addEventListener('click', () => {
     try { localStorage.setItem(WELCOME_KEY, '1'); } catch(e) {}
+    if (!onboardSeen()){ showOnboard(); return; }   // після привітання — знайомство з жестами
     $('#welcome').classList.add('leaving');
     setTimeout(enterApp, 450);
   });
 
-  // ---------- підказка про свайп при першому запуску ----------
-  const COACH_KEY = 'daynest-coach-v1';
-  let coachTimer = null, coachPeek = null;
-  function coachSeen(){ try { return localStorage.getItem(COACH_KEY) === '1'; } catch(e) { return false; } }
-  function showCoach(){
-    const c = $('#coach');
-    c.hidden = false;
-    requestAnimationFrame(() => requestAnimationFrame(() => c.classList.add('show')));
-    // сторінка сама трохи «визирає» вліво, показуючи, що поруч є ще екрани
-    if (!matchMedia('(prefers-reduced-motion: reduce)').matches){
-      coachPeek = track.animate([
-        {transform:'translateX(0)'}, {transform:'translateX(0)', offset:.2},
-        {transform:'translateX(-72px)', offset:.55}, {transform:'translateX(0)', offset:.85}, {transform:'translateX(0)'}],
-        {duration:1600, iterations:3, easing:'cubic-bezier(.45,0,.3,1)', delay:300});
-    }
-    coachTimer = setTimeout(hideCoach, 6500);
-    // будь-який дотик закриває підказку (сам свайп при цьому працює)
-    document.addEventListener('pointerdown', hideCoach, {capture:true, once:true});
-  }
-  function hideCoach(){
-    const c = $('#coach');
-    if (c.hidden || !c.classList.contains('show')) return;
-    clearTimeout(coachTimer);
-    document.removeEventListener('pointerdown', hideCoach, {capture:true});
-    if (coachPeek){ coachPeek.cancel(); coachPeek = null; }
-    try { localStorage.setItem(COACH_KEY, '1'); } catch(e) {}
-    c.classList.remove('show');
-    setTimeout(() => { c.hidden = true; if (state.page === 0) showBubble(); }, 350);
-  }
+  // ---------- онбординг (один раз, після привітання) ----------
+  const ONBOARD_KEY = 'daynest-onboard-v1';
+  const OB_TEXT = [
+    'Натисни на сонечко, щоб повернутися до сьогоднішнього дня.',
+    'Свайпни вліво, щоб перейти на наступну сторінку.',
+    'Натисни на котика, щоб запланувати день.'];
+  const onboard = $('#onboard'), obSteps = [...onboard.querySelectorAll('.ob-step')];
+  let obStep = 0, obReady = false;
+  function onboardSeen(){ try { return localStorage.getItem(ONBOARD_KEY) === '1'; } catch(e) { return false; } }
 
-  // бульбашка біля котика: показуємо після старту й ховаємо через 4 секунди
-  let bubbleTimer = null;
-  function showBubble(){
-    const b = $('#catBubble');
-    b.classList.add('show');
-    clearTimeout(bubbleTimer);
-    bubbleTimer = setTimeout(hideBubble, 4000);
+  // заповнюємо мініатюри: ті самі картинки котика й сонця, справжні дати поточного тижня й місяця
+  function obPrepare(){
+    if (obReady) return; obReady = true;
+    onboard.querySelectorAll('img[data-src]').forEach(i => { const src = document.querySelector(i.dataset.src); if (src) i.src = src.src; });
+    const now = new Date(); now.setHours(0,0,0,0);
+    const ti = wdIndex(now), mon = mondayOf(now);
+    const fi = ti < 6 ? ti + 1 : ti - 1;                 // «інший» день: завтра (або вчора, якщо сьогодні неділя)
+    const other = addDays(mon, fi);
+    const set = (k, v) => onboard.querySelectorAll(`[data-k="${k}"]`).forEach(e => e.textContent = v);
+    set('titleA', fi === ti + 1 ? 'Справи на завтра' : 'Справи на день');
+    set('dateA', `${WD_FULL[fi]}, ${longDate(other)}`);
+    set('dateB', longDate(now));
+    set('month', `${MONTH_NOM[now.getMonth()]} ${now.getFullYear()}`);
+    set('listTitle', `Плани на ${now.getDate()} ${MONTH_GEN[now.getMonth()]}`);
+    onboard.querySelectorAll('.m-strip').forEach(st => {
+      const moving = st.dataset.strip === '1';
+      let html = moving ? '<div class="m-base">' + '<span></span>'.repeat(7) + '</div><span class="m-pill"></span><span class="m-ring"></span>' : '';
+      for (let i = 0; i < 7; i++){
+        const x = addDays(mon, i);
+        const cls = moving ? 'm-chip ghost' + (i === fi ? ' from' : '') + (i === ti ? ' to' : '')
+                           : 'm-chip' + (i === ti ? ' sel' : '');
+        html += `<span class="${cls}"><i>${WD_SHORT[i]}</i><b>${x.getDate()}</b></span>`;
+      }
+      st.innerHTML = html;
+      if (moving){ st.style.setProperty('--from', fi); st.style.setProperty('--to', ti); st.style.setProperty('--dir', Math.sign(ti - fi)); }
+    });
+    // календар місяця для другої сторінки
+    const first = new Date(now.getFullYear(), now.getMonth(), 1), start = mondayOf(first);
+    const last = new Date(now.getFullYear(), now.getMonth() + 1, 0), end = addDays(mondayOf(last), 6);
+    let g = '';
+    for (let d = new Date(start); d <= end; d = addDays(d, 1))
+      g += `<span class="${d.getMonth() !== now.getMonth() ? 'out' : ''}${keyOf(d) === keyOf(now) ? ' today' : ''}"><b>${d.getDate()}</b></span>`;
+    $('#obGrid').innerHTML = g;
   }
-  function hideBubble(){ clearTimeout(bubbleTimer); $('#catBubble').classList.remove('show'); }
+  // демонстрація займає весь вільний простір, зберігаючи пропорції 300×400
+  function obFit(){
+    const st = $('#obStage'); if (!st.clientHeight) return;
+    $('#obFit').style.setProperty('--k', Math.min(st.clientWidth / 300, st.clientHeight / 400, 1.3).toFixed(3));
+  }
+  function obGo(i){
+    const prev = obStep; obStep = i;
+    obSteps.forEach((s, j) => {
+      s.classList.toggle('active', j === i);
+      s.classList.toggle('past', j < i);
+      if (j === i){ s.classList.remove('run'); void s.offsetWidth; s.classList.add('run'); }   // кожен крок — з початку хореографії
+      else if (j === prev) setTimeout(() => { if (obStep !== j) s.classList.remove('run'); }, 600);   // попередній доанімовується під час переходу
+      else s.classList.remove('run');
+    });
+    $('#obProgress').textContent = `${i + 1}/3`;
+    $('#obProgress').setAttribute('aria-label', `Крок ${i + 1} з 3`);
+    const last = i === OB_TEXT.length - 1;
+    $('#obNext').textContent = last ? 'Почати' : 'Далі';
+    $('#obSkip').setAttribute('aria-hidden', last); $('#obSkip').tabIndex = last ? -1 : 0;
+    const p = $('#obText');
+    if (p.textContent === OB_TEXT[i]) return;
+    p.classList.add('swap');
+    setTimeout(() => { p.textContent = OB_TEXT[i]; p.classList.remove('swap'); }, 180);
+  }
+  function showOnboard(){
+    obPrepare();
+    // онбординг проявляється поверх привітання, тож планер між ними не «блимає»; привітання ховаємо після переходу
+    setTimeout(() => { $('#welcome').hidden = true; $('#welcome').classList.remove('leaving'); }, 460);
+    onboard.hidden = false;
+    // ширина надрукованого тексту — щоб курсор ішов точно за літерами (міряємо, коли екран уже видно)
+    const typed = $('#obTyped'); typed.parentElement.style.setProperty('--tw', typed.offsetWidth + 1 + 'px');
+    obGo(0);
+    obFit();
+    requestAnimationFrame(() => requestAnimationFrame(() => { obFit(); onboard.classList.add('show'); }));
+    window.addEventListener('resize', obFit);
+  }
+  function finishOnboard(){
+    try { localStorage.setItem(ONBOARD_KEY, '1'); } catch(e) {}
+    window.removeEventListener('resize', obFit);
+    onboard.classList.remove('show');
+    enterApp();
+    setTimeout(() => { onboard.hidden = true; obSteps.forEach(s => s.classList.remove('run')); }, 460);
+  }
+  $('#obNext').addEventListener('click', () => obStep < OB_TEXT.length - 1 ? obGo(obStep + 1) : finishOnboard());
+  $('#obSkip').addEventListener('click', finishOnboard);
+  // свайпи по демонстрації: вліво — далі, вправо — назад
+  (() => {
+    let x0 = 0, y0 = 0, id = null;
+    const st = $('#obStage');
+    st.addEventListener('pointerdown', e => { id = e.pointerId; x0 = e.clientX; y0 = e.clientY; });
+    st.addEventListener('pointerup', e => {
+      if (e.pointerId !== id) return; id = null;
+      const dx = e.clientX - x0, dy = e.clientY - y0;
+      if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+      if (dx < 0 && obStep < OB_TEXT.length - 1) obGo(obStep + 1);
+      else if (dx > 0 && obStep > 0) obGo(obStep - 1);
+    });
+    st.addEventListener('pointercancel', () => id = null);
+  })();
+  document.addEventListener('keydown', e => {
+    if (onboard.hidden || e.target.closest('button')) return;
+    if (e.key === 'ArrowRight' && obStep < OB_TEXT.length - 1) obGo(obStep + 1);
+    if (e.key === 'ArrowLeft' && obStep > 0) obGo(obStep - 1);
+  });
 
   // ---------- pager & swipe ----------
   const track = $('#track');
@@ -1129,7 +1470,6 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     state.page = p;
     track.style.transform = `translateX(${-p*100/PAGES}%)`;
     document.querySelectorAll('.dots button').forEach(b => b.setAttribute('aria-current', +b.dataset.page === p));
-    if (typeof hideCoach === 'function' && p !== 0) hideCoach();
     ['#pageDay', '#pageCal', '#pageFocus'].forEach((s, i) => $(s).inert = i !== p);
     $('#live').textContent = PAGE_NAMES[p];
   }
@@ -1184,7 +1524,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
 
   document.addEventListener('keydown', e => {
     if (!sheet.hidden){ if (e.key === 'Escape') closeSheet(); return; }
-    if (!$('#welcome').hidden) return;
+    if (!$('#welcome').hidden || !$('#onboard').hidden) return;
     if (e.target.closest('input,textarea')) return;
     if (e.target.closest('.dial, select')) return;
     if (e.key === 'ArrowRight' && state.page < PAGES-1) go(state.page + 1);
@@ -1194,7 +1534,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
   // ---------- add / edit sheet ----------
   const sheet = $('#sheet'), scrim = $('#scrim');
   let editing = null, justAdded = null, lastFocus = null;
-  $('#catBtn').addEventListener('click', e => { hideBubble(); const b = e.currentTarget; b.classList.remove('tapped'); void b.offsetWidth; b.classList.add('tapped'); setTimeout(() => openSheet(null), 180); });
+  $('#catBtn').addEventListener('click', e => { const b = e.currentTarget; b.classList.remove('tapped'); void b.offsetWidth; b.classList.add('tapped'); setTimeout(() => openSheet(null), 180); });
   function openSheet(task){
     editing = task;
     lastFocus = document.activeElement;
@@ -1631,7 +1971,7 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
   renderAll();
   checkReminders();
   // повторний запуск: без привітання, одразу на сьогоднішній день
-  if (welcomeSeen()) enterApp(true);
+  if (welcomeSeen()){ if (onboardSeen()) enterApp(true); else showOnboard(); }
 })();
 </script>
 </body></html>

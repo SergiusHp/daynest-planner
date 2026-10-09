@@ -133,17 +133,6 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .cat-btn:active + .tap,.cat-btn.tapped + .tap{animation:tap .5s ease}
 .tap{position:absolute;left:58%;top:4%;width:30px;opacity:0;pointer-events:none}
 @keyframes tap{0%{opacity:0;transform:translateY(8px) scale(.6)}40%{opacity:1}100%{opacity:0;transform:translateY(-26px) scale(1)}}
-/* комікс-бульбашка біля котика: вискакує «попом» і сама зникає через кілька секунд */
-.bubble{position:absolute;left:var(--space-4);top:-48px;z-index:1;max-width:146px;padding:8px 12px;
-  background:#fffaf0;border:2.5px solid var(--brown);border-radius:22px 22px 22px 8px;box-shadow:3px 3px 0 var(--brown);
-  font-size:13px;line-height:17px;font-weight:800;color:var(--ink);pointer-events:none;
-  opacity:0;transform:scale(.4) rotate(-8deg);transform-origin:88% 120%;
-  transition:opacity .35s ease, transform .5s cubic-bezier(.34,1.56,.64,1)}
-.bubble.show{opacity:1;transform:scale(1) rotate(-3deg)}
-/* хвостик бульбашки: обвідка (before) і заливка (after), нахилені до котика */
-.bubble::before,.bubble::after{content:"";position:absolute;width:0;height:0;border-style:solid;transform:skewX(-46deg);transform-origin:top}
-.bubble::before{right:16px;bottom:-24px;border-width:24px 3px 0 17px;border-color:var(--brown) transparent transparent transparent}
-.bubble::after{right:20.5px;bottom:-15px;border-width:16px 2px 0 10px;border-color:#fffaf0 transparent transparent transparent}
 /* навігаційна стрілка: лише іконка, напівпрозора, мʼяко «хвилюється» */
 .hint{position:absolute;right:var(--space-3);bottom:4px;width:44px;height:44px;display:grid;place-items:center;
   border-radius:var(--r-pill);color:var(--brown);opacity:.6;transition:opacity .2s ease}
@@ -192,10 +181,7 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .events li .t{flex:none;font-size:14px;color:var(--ink-muted)}
 .events li.done::before{background:#fef5e3;border-color:#d1b48d}
 .events li.done{opacity:.5}
-.swipe-hint{margin-top:var(--space-4);font-size:12px;line-height:16px;color:var(--ink-muted)}
 /* підказка про свайп зникає сама через 5 секунд після старту */
-.swipe-hint{max-height:60px;overflow:hidden;transition:opacity .5s ease, max-height .45s ease .35s, margin-top .45s ease .35s}
-.swipe-hint.gone{opacity:0;max-height:0;margin-top:0}
 .group-label{font-size:12px;line-height:16px;font-weight:800;color:var(--ink-muted);margin-top:var(--space-4);letter-spacing:.02em}
 
 /* ---------- focus ---------- */
@@ -253,27 +239,6 @@ img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none}
 .sessions img{width:18px;height:18px}
 
 
-/* ---------- підказка про свайп (перший запуск) ---------- */
-.coach{position:absolute;inset:0;z-index:8;display:flex;align-items:flex-end;justify-content:center;
-  padding:0 var(--space-6) 140px;background:rgba(43,26,13,.22);opacity:0;transition:opacity .35s ease;pointer-events:none}
-.coach.show{opacity:1}
-.coach-card{width:100%;max-width:300px;background:#fffaf0;border:2.5px solid var(--brown);border-radius:22px;box-shadow:4px 4px 0 var(--brown);
-  padding:var(--space-4) var(--space-4) var(--space-3);text-align:center;transform:translateY(16px) scale(.92);
-  transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
-.coach.show .coach-card{transform:none}
-.coach-card p{font-size:16px;line-height:22px;font-weight:800;color:var(--ink);margin-top:var(--space-2)}
-.coach-skip{display:block;margin-top:var(--space-2);font-size:12px;line-height:16px;font-weight:700;color:var(--ink-muted)}
-.coach-demo{position:relative;height:56px;margin:0 auto;width:200px}
-/* пунктирний слід свайпу зі стрілкою вліво */
-.coach-trail{position:absolute;left:18px;right:18px;top:27px;border-top:3px dashed var(--chip)}
-.coach-trail::before{content:"";position:absolute;left:-4px;top:-8.5px;width:11px;height:11px;border-left:3px solid var(--accent);
-  border-bottom:3px solid var(--accent);transform:rotate(45deg);border-radius:2px}
-.coach-paw{position:absolute;top:6px;left:50%;width:44px;height:44px;margin-left:-22px;animation:coachSwipe 1.6s cubic-bezier(.45,0,.3,1) infinite}
-@keyframes coachSwipe{
-  0%{transform:translateX(70px) scale(.9);opacity:0}
-  15%{transform:translateX(64px) scale(1);opacity:1}
-  70%{transform:translateX(-66px) scale(1) rotate(-8deg);opacity:1}
-  88%,100%{transform:translateX(-72px) scale(.85);opacity:0}}
 
 /* ---------- pager dots ---------- */
 .dots{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
@@ -325,6 +290,234 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
 .btn.primary{background:var(--accent);color:var(--on-accent);box-shadow:0 3px 0 #c95a1d}
 .del{display:block;margin:var(--space-3) auto 0;font-size:14px;font-weight:800;color:#b24a12;padding:6px 10px;border-radius:var(--r-sm)}
 
+/* ---------- онбординг ---------- */
+/* Один крок на екрані: велика анімована демонстрація (300×400, масштабується під екран), інструкція, прогрес і кнопки.
+   Хореографія кожного демо: жест → відповідь інтерфейсу → пауза → м'яке скидання; анімуються лише transform та opacity. */
+.onboard{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + var(--space-2)) var(--space-6) calc(env(safe-area-inset-bottom,0px) + var(--space-6));
+  background:linear-gradient(180deg,var(--cal-top) 0%,var(--day) 46%,var(--day) 100%);
+  opacity:0;transition:opacity .45s ease}
+.onboard.show{opacity:1}
+.ob-top{flex:none;height:48px;display:flex;align-items:center;justify-content:space-between}
+.ob-progress{font-size:13px;line-height:18px;font-weight:800;color:var(--ink-muted);font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.ob-skip{min-height:44px;min-width:44px;padding:0 2px 0 var(--space-4);font-size:15px;line-height:20px;font-weight:800;color:var(--ink-soft);border-radius:var(--r-sm)}
+.ob-skip[aria-hidden="true"]{visibility:hidden}
+.ob-stage{position:relative;flex:1;min-height:0;margin-top:var(--space-2)}
+/* тепле сяйво за карткою — легка глибина без зайвих деталей */
+.ob-glow{position:absolute;left:50%;top:50%;width:min(92%,360px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(253,209,149,.55) 0%,rgba(253,209,149,0) 68%);pointer-events:none}
+.ob-fit{position:absolute;left:50%;top:50%;width:300px;height:400px;transform:translate(-50%,-50%) scale(var(--k,1))}
+.ob-step{position:absolute;inset:0;opacity:0;transform:translateX(40px);pointer-events:none;
+  transition:opacity .42s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.ob-step.active{opacity:1;transform:none}
+.ob-step.past{transform:translateX(-40px)}
+.ob-copy{flex:none;margin-top:var(--space-6);min-height:84px;display:flex;align-items:flex-start;justify-content:center}
+.ob-copy p{max-width:17em;text-align:center;font-size:21px;line-height:28px;font-weight:800;color:var(--ink);text-wrap:balance;
+  transition:opacity .2s ease,transform .2s ease}
+.ob-copy p.swap{opacity:0;transform:translateY(6px)}
+.ob-actions{flex:none;margin-top:var(--space-4)}
+.ob-actions .btn{min-height:54px}
+@media (max-height:700px){
+  .ob-copy{margin-top:var(--space-4);min-height:78px}
+  .ob-copy p{font-size:19px;line-height:26px}
+}
+
+/* картка-мініатюра екрана застосунку */
+.ob-card{position:absolute;inset:0;overflow:hidden;border-radius:30px;background:var(--day);
+  box-shadow:0 0 0 2px #f4d6aa,0 7px 0 #efc994,0 28px 44px -22px rgba(95,37,7,.42)}
+.m-head{position:absolute;left:20px;top:24px;width:210px}
+.m-titles{position:relative;height:24px}
+.m-t{position:absolute;left:0;top:0;white-space:nowrap;font-size:18px;line-height:24px;font-weight:800;color:var(--ink)}
+.m-dates{position:relative;height:16px;margin-top:4px}
+.m-d{position:absolute;left:0;top:0;white-space:nowrap;font-size:11px;line-height:16px;font-weight:700;color:var(--ink-muted)}
+.m-d::first-letter{text-transform:uppercase}
+.m-sun-wrap{position:absolute;left:236px;top:16px;width:46px;height:46px}
+.m-sun{width:100%;height:100%;animation:spin 40s linear infinite}
+.m-strip{position:absolute;left:20px;top:88px;width:260px;height:44px;display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.m-chip{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:9px;
+  background:var(--chip);color:var(--ink)}
+.m-chip i{font-style:normal;font-size:9px;line-height:11px;font-weight:700}
+.m-chip b{font-size:13px;line-height:15px;font-weight:800}
+.m-chip.sel{background:var(--accent);color:var(--on-accent)}
+.m-chip.today:not(.sel)::after{content:"";position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.m-strip .m-chip.ghost{background:transparent}           /* у кроці 1 фон чипів малює окремий шар, щоб «таблетка» ковзала між ними */
+.m-strip .m-base{position:absolute;inset:0;display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.m-strip .m-base span{border-radius:9px;background:var(--chip)}
+.m-pill{position:absolute;left:0;top:0;width:calc((100% - 30px) / 7);height:100%;border-radius:9px;background:var(--accent);
+  transform:translateX(calc(var(--to) * (100% + 5px)))}
+.m-ring{position:absolute;left:0;top:0;width:calc((100% - 30px) / 7);height:100%;border-radius:11px;box-shadow:0 0 0 3px var(--accent);
+  opacity:0;transform:translateX(calc(var(--to) * (100% + 5px)))}
+.m-rows{position:absolute;left:20px;right:20px;top:148px;list-style:none;margin:0;padding:0}
+.m-rows li{display:flex;align-items:center;gap:10px;height:30px;font-size:13px;line-height:18px;font-weight:700;color:var(--ink);white-space:nowrap}
+.m-rows li+li{border-top:1px solid rgba(134,102,74,.16)}
+.m-rows i{flex:none;width:15px;height:15px;border-radius:4px;border:2px solid var(--brown);background:#fdf4e3}
+.m-scene{position:absolute;left:0;bottom:0;width:300px;height:156px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 16%);mask-image:linear-gradient(to bottom,transparent 0,#000 16%)}
+
+/* рука, дотик, хвиля */
+.hand-wrap{position:absolute;left:calc(var(--x) - 23.5px);top:calc(var(--y) - 3px);width:58px;height:76px;opacity:0;
+  transform-origin:23.5px 3px;filter:drop-shadow(0 4px 4px rgba(95,37,7,.18))}
+.hand{display:block;width:58px;height:76px;overflow:visible}
+.touch{position:absolute;left:10.5px;top:-10px;width:26px;height:26px;border-radius:50%;background:var(--accent);opacity:0}
+.ripple{position:absolute;left:229px;top:9px;width:60px;height:60px;border-radius:50%;border:3px solid var(--accent);opacity:0;transform:scale(.3)}
+
+/* ===== крок 1 ===== */
+.s1{--d:4.8s}
+.s1 .hand-wrap{--x:259px;--y:40px}
+.s1 .m-titles .tb,.s1 .m-dates .tb,.s1 .m-rows.tb{opacity:0}
+.s1 .m-pill{transform:translateX(calc(var(--from) * (100% + 5px)))}
+.s1 .m-chip.from{color:var(--on-accent)}
+.s1.run .hand-wrap{animation:obTap1 var(--d) infinite}
+.s1.run .ripple{animation:obRipple1 var(--d) infinite}
+.s1.run .m-sun-wrap{animation:obSun1 var(--d) infinite}
+.s1.run .m-pill{animation:obPill1 var(--d) infinite}
+.s1.run .m-chip.from{animation:obFromTxt var(--d) infinite}
+.s1.run .m-chip.to{animation:obToTxt var(--d) infinite}
+.s1.run .m-ring{animation:obRing1 var(--d) infinite}
+.s1.run .ta{animation:obOut1 var(--d) infinite}
+.s1.run .tb{animation:obIn1 var(--d) infinite}
+@keyframes obTap1{
+  0%{opacity:0;transform:translate(44px,70px) rotate(10deg);animation-timing-function:cubic-bezier(.2,.7,.3,1)}
+  13%{opacity:1;transform:translate(5px,9px) rotate(2deg);animation-timing-function:ease-in-out}
+  18%{opacity:1;transform:translate(0,-5px) scale(1.04)}                       /* передчуття */
+  22%{opacity:1;transform:translate(0,1px) scale(.9);animation-timing-function:ease-out}  /* натискання */
+  29%{opacity:1;transform:translate(0,0) scale(1)}
+  50%{opacity:1;transform:translate(8px,16px) rotate(3deg);animation-timing-function:ease-in}
+  62%,100%{opacity:0;transform:translate(40px,64px) rotate(10deg)}}
+@keyframes obRipple1{0%,21%{opacity:0;transform:scale(.3)}23%{opacity:.75;transform:scale(.42)}46%,100%{opacity:0;transform:scale(1.6)}}
+@keyframes obSun1{0%,21%{transform:scale(1)}24%{transform:scale(.92)}31%{transform:scale(1.05)}38%,100%{transform:scale(1)}}
+@keyframes obPill1{
+  0%,25%{opacity:1;transform:translateX(calc(var(--from) * (100% + 5px)));animation-timing-function:cubic-bezier(.3,0,.15,1)}
+  38%{opacity:1;transform:translateX(calc(var(--to) * (100% + 5px) + var(--dir) * 3px));animation-timing-function:ease-out}  /* легкий «перельот» */
+  42%,85%{opacity:1;transform:translateX(calc(var(--to) * (100% + 5px)))}
+  90%{opacity:0;transform:translateX(calc(var(--to) * (100% + 5px)))}
+  91%{opacity:0;transform:translateX(calc(var(--from) * (100% + 5px)))}
+  97%,100%{opacity:1;transform:translateX(calc(var(--from) * (100% + 5px)))}}
+@keyframes obFromTxt{0%,27%{color:var(--on-accent)}33%,94%{color:var(--ink)}98%,100%{color:var(--on-accent)}}
+@keyframes obToTxt{0%,33%{color:var(--ink)}38%,86%{color:var(--on-accent)}90%,100%{color:var(--ink)}}
+@keyframes obRing1{0%,40%{opacity:0;transform:translateX(calc(var(--to) * (100% + 5px))) scale(.92)}
+  45%{opacity:1;transform:translateX(calc(var(--to) * (100% + 5px))) scale(1)}
+  64%,100%{opacity:0;transform:translateX(calc(var(--to) * (100% + 5px))) scale(1.28)}}
+@keyframes obOut1{0%,27%{opacity:1}34%,87%{opacity:0}93%,100%{opacity:1}}
+@keyframes obIn1{0%,29%{opacity:0}36%,85%{opacity:1}91%,100%{opacity:0}}
+
+/* ===== крок 2 ===== */
+.s2{--d:4.6s}
+.m-screen{position:absolute;inset:0}
+.m-track{position:absolute;left:0;top:0;width:600px;height:100%;display:flex}
+.m-page{position:relative;flex:none;width:300px;height:100%}
+.m-cal{background:var(--cal-top)}
+.m-seg{position:absolute;left:50%;top:22px;transform:translateX(-50%);display:flex;gap:3px;padding:3px;border-radius:var(--r-pill);background:var(--tog)}
+.m-seg span{padding:4px 11px;border-radius:var(--r-pill);font-size:10.5px;line-height:13px;font-weight:800;color:var(--ink-soft)}
+.m-seg .on{background:var(--accent);color:var(--on-accent)}
+.m-month{position:absolute;left:20px;top:58px;font-size:16px;line-height:22px;font-weight:800;color:var(--ink)}
+.m-grid{position:absolute;left:20px;top:88px;width:260px;display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px}
+.m-grid span{height:20px;display:grid;place-items:center;font-size:10px;font-weight:700;color:var(--ink)}
+.m-grid span.out{color:var(--ink-faint)}
+.m-grid span.today b{width:18px;height:18px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:var(--on-accent);font-weight:800}
+.m-grid b{font-weight:inherit}
+.m-list-t{position:absolute;left:20px;top:232px;font-size:12px;line-height:16px;font-weight:800;color:var(--ink)}
+.m-cal .m-rows{top:254px}
+.m-dots{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:5px}
+.m-dots span{width:6px;height:6px;border-radius:50%;background:var(--ink-faint)}
+.m-dots em{position:absolute;left:0;top:0;width:6px;height:6px;border-radius:50%;background:var(--brown);box-shadow:0 0 0 1px var(--brown)}
+.trail{position:absolute;left:62px;top:199px;width:174px;height:0;border-top:3px dashed var(--accent);opacity:0;transform-origin:100% 50%;transform:scaleX(0)}
+.trail::before{content:"";position:absolute;left:-2px;top:-9.5px;width:11px;height:11px;border-left:3px solid var(--accent);border-bottom:3px solid var(--accent);
+  border-radius:2px;transform:rotate(45deg)}
+.s2 .hand-wrap{--x:236px;--y:200px}
+.s2.run .hand-wrap{animation:obDrag2 var(--d) infinite}
+.s2.run .touch{animation:obTouch2 var(--d) infinite}
+.s2.run .m-track{animation:obTrack2 var(--d) infinite}
+.s2.run .m-screen{animation:obScreen2 var(--d) infinite}
+.s2.run .m-dots em{animation:obDot2 var(--d) infinite}
+.s2.run .trail{animation:obTrail2 var(--d) infinite}
+@keyframes obDrag2{
+  0%{opacity:0;transform:translate(26px,44px) rotate(8deg);animation-timing-function:cubic-bezier(.2,.7,.3,1)}
+  11%{opacity:1;transform:translate(0,0) rotate(0);animation-timing-function:ease-in-out}
+  16%{opacity:1;transform:translate(3px,-4px) scale(1.04)}                         /* передчуття: трохи вправо й угору */
+  21%{opacity:1;transform:translate(0,1px) scale(.92);animation-timing-function:cubic-bezier(.45,0,.35,1)}
+  52%{opacity:1;transform:translate(-170px,1px) scale(.92) rotate(-6deg);animation-timing-function:ease-out}
+  59%{opacity:1;transform:translate(-178px,-6px) scale(1) rotate(-6deg);animation-timing-function:ease-in}
+  70%,100%{opacity:0;transform:translate(-196px,-34px) scale(1) rotate(-10deg)}}
+@keyframes obTouch2{0%,20%{opacity:0;transform:scale(.4)}23%,50%{opacity:.28;transform:scale(1)}57%,100%{opacity:0;transform:scale(1.5)}}
+@keyframes obTrack2{
+  0%,21%{transform:translateX(0);animation-timing-function:cubic-bezier(.45,0,.35,1)}
+  52%{transform:translateX(-170px);animation-timing-function:cubic-bezier(.2,.75,.25,1)}   /* сторінка йде за пальцем */
+  61%{transform:translateX(-306px);animation-timing-function:ease-in-out}                 /* інерція з невеликим перельотом */
+  67%,89%{transform:translateX(-300px);animation-timing-function:steps(1,end)}
+  90%,100%{transform:translateX(0)}}
+@keyframes obScreen2{0%,84%{opacity:1}89%,91%{opacity:0}98%,100%{opacity:1}}
+@keyframes obDot2{0%,52%{transform:translateX(0);animation-timing-function:cubic-bezier(.3,0,.2,1)}60%,84%{transform:translateX(11px)}89%{opacity:1;transform:translateX(11px)}90%{opacity:0;transform:translateX(0)}96%,100%{opacity:1;transform:translateX(0)}}
+@keyframes obTrail2{0%,21%{opacity:0;transform:scaleX(0);animation-timing-function:cubic-bezier(.45,0,.35,1)}24%{opacity:1}
+  52%{opacity:1;transform:scaleX(1)}68%,100%{opacity:0;transform:scaleX(1)}}
+
+/* ===== крок 3 ===== */
+.s3{--d:5.6s}
+.s3 .m-scene{transform-origin:60% 100%}
+.m-paw{position:absolute;left:176px;top:250px;width:24px;height:24px;opacity:0}
+.m-scrim{position:absolute;inset:0;background:var(--scrim);opacity:0}
+.m-sheet{position:absolute;left:0;right:0;bottom:0;height:198px;padding:8px 18px 0;border-radius:22px 22px 0 0;background:var(--day);
+  box-shadow:0 -6px 18px rgba(95,37,7,.14);transform:translateY(104%)}
+.m-grab{display:block;width:30px;height:4px;margin:0 auto 4px;border-radius:var(--r-pill);background:var(--ink-faint)}
+.m-sheet-top{display:flex;align-items:center;gap:8px}
+.m-sheet-top img{width:58px;height:41px;margin-left:-4px}
+.m-sheet-top b{font-size:16px;line-height:22px;font-weight:800;color:var(--ink)}
+.m-label{display:block;margin-top:6px;font-size:10.5px;line-height:14px;font-weight:800;color:var(--ink-soft)}
+.m-input{position:relative;display:flex;align-items:center;height:42px;margin-top:5px;padding:0 11px;border-radius:11px;border:2px solid var(--accent);background:#fffaf0}
+.m-typed{display:inline-block;white-space:nowrap;font-size:13px;line-height:18px;font-weight:700;color:var(--ink);clip-path:inset(0 100% 0 0)}
+.m-caret{position:absolute;left:11px;top:11px;width:2px;height:16px;border-radius:1px;background:var(--accent)}
+.m-btns{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:12px}
+.m-btns span{display:grid;place-items:center;height:34px;border-radius:var(--r-pill);font-size:12px;font-weight:800;color:var(--ink-soft)}
+.m-btns .add{background:var(--accent);color:var(--on-accent);box-shadow:0 2px 0 #c95a1d}
+.s3 .hand-wrap{--x:184px;--y:326px}
+.s3.run .hand-wrap{animation:obTap3 var(--d) infinite}
+.s3.run .m-scene.cat{animation:obCat3 var(--d) infinite}
+.s3.run .m-paw{animation:obPaw3 var(--d) infinite}
+.s3.run .m-scrim{animation:obScrim3 var(--d) infinite}
+.s3.run .m-sheet{animation:obSheet3 var(--d) infinite}
+.s3.run .m-typed{animation:obType3 var(--d) infinite}
+.s3.run .m-caret{animation:obCaret3 var(--d) infinite,obBlink 1s steps(1) infinite}
+@keyframes obTap3{
+  0%{opacity:0;transform:translate(46px,60px) rotate(10deg);animation-timing-function:cubic-bezier(.2,.7,.3,1)}
+  11%{opacity:1;transform:translate(5px,8px) rotate(2deg);animation-timing-function:ease-in-out}
+  15%{opacity:1;transform:translate(0,-5px) scale(1.04)}
+  19%{opacity:1;transform:translate(0,1px) scale(.9);animation-timing-function:ease-out}
+  25%{opacity:1;transform:translate(0,0) scale(1);animation-timing-function:ease-in}
+  34%,100%{opacity:0;transform:translate(42px,58px) rotate(10deg)}}
+@keyframes obCat3{0%,19%{transform:none}22%{transform:scale(1.015,.975)}28%{transform:scale(.995,1.02) translateY(-2px)}33%,100%{transform:none}}
+@keyframes obPaw3{0%,21%{opacity:0;transform:translateY(6px) scale(.6)}27%{opacity:1;transform:translateY(-6px) scale(1)}40%,100%{opacity:0;transform:translateY(-26px) scale(1)}}
+@keyframes obScrim3{0%,29%{opacity:0}38%,87%{opacity:1}95%,100%{opacity:0}}
+@keyframes obSheet3{
+  0%,30%{transform:translateY(104%);animation-timing-function:cubic-bezier(.2,.8,.25,1)}
+  41%{transform:translateY(-2%);animation-timing-function:ease-in-out}
+  45%,87%{transform:translateY(0);animation-timing-function:cubic-bezier(.5,0,.75,0)}
+  95%,100%{transform:translateY(104%)}}
+@keyframes obType3{0%,48%{clip-path:inset(0 100% 0 0);animation-timing-function:steps(21,end)}70%,96%{clip-path:inset(0 0 0 0);animation-timing-function:steps(1,end)}97%,100%{clip-path:inset(0 100% 0 0)}}
+@keyframes obCaret3{0%,48%{transform:translateX(0);animation-timing-function:steps(21,end)}70%,96%{transform:translateX(var(--tw,150px));animation-timing-function:steps(1,end)}97%,100%{transform:translateX(0)}}
+@keyframes obBlink{0%,55%{opacity:1}56%,100%{opacity:0}}
+
+/* зменшений рух: чіткі статичні кадри замість анімацій */
+@media (prefers-reduced-motion:reduce){
+  .ob-step,.ob-step.past{transform:none}
+  .s1 .hand-wrap,.s3 .hand-wrap{opacity:1;transform:none}
+  .s1 .ripple{opacity:.6;transform:scale(1)}
+  .s1 .m-pill{transform:translateX(calc(var(--to) * (100% + 5px)))}
+  .s1 .m-chip.from{color:var(--ink)} .s1 .m-chip.to{color:var(--on-accent)}
+  .s1 .m-ring{opacity:1}
+  .s1 .m-titles .ta,.s1 .m-dates .ta,.s1 .m-rows.ta{opacity:0}
+  .s1 .m-titles .tb,.s1 .m-dates .tb,.s1 .m-rows.tb{opacity:1}
+  .s2 .hand-wrap{opacity:1;transform:translate(-112px,1px) scale(.92) rotate(-6deg)}
+  .s2 .touch{opacity:.28}
+  .s2 .m-track{transform:translateX(-112px)}
+  .s2 .trail{opacity:1;transform:scaleX(.66)}
+  .s3 .m-sheet{transform:translateY(52%)}                 /* шторка саме «виїжджає» з-під пальця */
+  .s3 .m-scrim{opacity:.55}
+  .s3 .m-typed{clip-path:none}
+  .s3 .m-caret{transform:translateX(var(--tw,150px))}
+  .s3 .m-paw{opacity:1;transform:translateY(-6px)}
+  .s3 .hand-wrap{--y:268px;clip-path:inset(0 0 36px 0)}   /* палець на голові котика, кисть сховалась за шторкою */
+}
+
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -341,6 +534,101 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     <footer>
       <button class="btn" id="startBtn" type="button">Розпочати</button>
     </footer>
+  </section>
+
+  <!-- онбординг: три кроки з анімованими демонстраціями (показується один раз, після привітання) -->
+  <section class="onboard" id="onboard" aria-label="Як користуватися застосунком" hidden>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <!-- мультяшна рука з витягнутим пальцем; кінчик пальця — точка (26, 3) -->
+      <symbol id="obHand" viewBox="0 0 64 84">
+        <g stroke="#5f2507" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M14 68 h34 a4 4 0 0 1 4 4 v11 h-42 v-11 a4 4 0 0 1 4 -4z" fill="#f67a36"/>
+          <path d="M19 42 V10 a7 7 0 0 1 14 0 v22 a5.5 5.5 0 0 1 10.5 1.5 a5.5 5.5 0 0 1 10 2.5 v13 q0 19 -19 19 h-6 q-11 0 -15.5 -9 l-6.5 -13 a5.2 5.2 0 0 1 8.5 -5.8 z" fill="#fffaf0"/>
+          <path d="M33 32 v6 M43.5 33.5 v6" fill="none" stroke-width="2.6"/>
+          <path d="M22.5 8.5 q3.5 -2.5 7 0" fill="none" stroke="#f9a77a" stroke-width="2.2"/>
+        </g>
+      </symbol>
+    </svg>
+
+    <div class="ob-top">
+      <span class="ob-progress" id="obProgress">1/3</span>
+      <button class="ob-skip" id="obSkip" type="button">Пропустити</button>
+    </div>
+
+    <div class="ob-stage" id="obStage" aria-hidden="true">
+      <div class="ob-glow"></div>
+      <div class="ob-fit" id="obFit">
+
+        <!-- крок 1: сонечко повертає на сьогодні -->
+        <div class="ob-step s1" data-step="0">
+          <div class="ob-card">
+            <div class="m-head">
+              <div class="m-titles"><b class="m-t ta" data-k="titleA"></b><b class="m-t tb">Сьогоднішні справи</b></div>
+              <div class="m-dates"><span class="m-d ta" data-k="dateA"></span><span class="m-d tb" data-k="dateB"></span></div>
+            </div>
+            <div class="m-sun-wrap"><img class="m-sun" data-src=".day-head .sun" alt=""></div>
+            <span class="ripple"></span>
+            <div class="m-strip" data-strip="1"></div>
+            <ul class="m-rows ta"><li><i></i>Купити продукти</li><li><i></i>Подзвонити бабусі</li></ul>
+            <ul class="m-rows tb"><li><i></i>Прочитати 10 сторінок</li><li><i></i>Прогулянка з котиком</li><li><i></i>Полити квіти</li></ul>
+            <img class="m-scene" data-src=".cat-zone .scene" alt="">
+          </div>
+          <div class="hand-wrap h1"><svg class="hand"><use href="#obHand"/></svg></div>
+        </div>
+
+        <!-- крок 2: свайп вліво — наступна сторінка -->
+        <div class="ob-step s2" data-step="1">
+          <div class="ob-card">
+            <div class="m-screen">
+              <div class="m-track">
+                <div class="m-page">
+                  <div class="m-head"><div class="m-titles"><b class="m-t">Сьогоднішні справи</b></div><div class="m-dates"><span class="m-d" data-k="dateB"></span></div></div>
+                  <div class="m-sun-wrap"><img class="m-sun" data-src=".day-head .sun" alt=""></div>
+                  <div class="m-strip" data-strip="0"></div>
+                  <ul class="m-rows"><li><i></i>Прочитати 10 сторінок</li><li><i></i>Прогулянка з котиком</li><li><i></i>Полити квіти</li></ul>
+                  <img class="m-scene" data-src=".cat-zone .scene" alt="">
+                </div>
+                <div class="m-page m-cal">
+                  <div class="m-seg"><span>Тиждень</span><span class="on">Місяць</span></div>
+                  <b class="m-month" data-k="month"></b>
+                  <div class="m-grid" id="obGrid"></div>
+                  <p class="m-list-t" data-k="listTitle"></p>
+                  <ul class="m-rows"><li><i></i>Прочитати 10 сторінок</li><li><i></i>Полити квіти</li></ul>
+                </div>
+              </div>
+            </div>
+            <div class="m-dots"><span></span><span></span><span></span><em></em></div>
+          </div>
+          <span class="trail"></span>
+          <div class="hand-wrap h2"><span class="touch"></span><svg class="hand"><use href="#obHand"/></svg></div>
+        </div>
+
+        <!-- крок 3: котик відкриває «Новий план» -->
+        <div class="ob-step s3" data-step="2">
+          <div class="ob-card">
+            <div class="m-head"><div class="m-titles"><b class="m-t">Сьогоднішні справи</b></div><div class="m-dates"><span class="m-d" data-k="dateB"></span></div></div>
+            <div class="m-sun-wrap"><img class="m-sun" data-src=".day-head .sun" alt=""></div>
+            <div class="m-strip" data-strip="0"></div>
+            <ul class="m-rows"><li><i></i>Прогулянка з котиком</li></ul>
+            <img class="m-scene cat" data-src=".cat-zone .scene" alt="">
+            <img class="m-paw" data-src=".cat-zone .tap" alt="">
+            <span class="m-scrim"></span>
+            <div class="m-sheet">
+              <span class="m-grab"></span>
+              <div class="m-sheet-top"><img data-src=".sheet-top img" alt=""><b>Новий план</b></div>
+              <span class="m-label">Що плануєш зробити?</span>
+              <div class="m-input"><span class="m-typed" id="obTyped">Прочитати 10 сторінок</span><span class="m-caret"></span></div>
+              <div class="m-btns"><span>Скасувати</span><span class="add">Додати</span></div>
+            </div>
+          </div>
+          <div class="hand-wrap h3"><svg class="hand"><use href="#obHand"/></svg></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="ob-copy"><p id="obText" aria-live="polite">Натисни на сонечко, щоб повернутися до сьогоднішнього дня.</p></div>
+    <div class="ob-actions"><button class="btn primary" id="obNext" type="button">Далі</button></div>
   </section>
 
   <div class="main" id="main" aria-hidden="true">
@@ -364,13 +652,11 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
           </div>
           <div class="task-scroll" id="taskScroll">
           <ul class="tasks" id="tasks"></ul>
-          <p class="swipe-hint" id="swipeHint">Проведи по справі вправо, щоб закреслити. Ще раз — щоб повернути.</p>
           <p class="empty" id="emptyDay" hidden>На цей день ще немає планів. Натисни на котика, щоб додати перший.</p>
           </div>
         </div>
         <div class="cat-zone">
           <img class="scene" src="{{catscene}}" alt="">
-          <p class="bubble" id="catBubble" aria-hidden="true">Натисни на мене, щоб додати план</p>
           <button class="cat-btn" id="catBtn" type="button" aria-label="Додати план"></button>
           <img class="tap" src="{{paw}}" alt="">
           <button class="hint" type="button" id="toCal" aria-label="Відкрити тиждень і місяць">
@@ -509,16 +795,6 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
     </nav>
 
     <!-- підказка про свайп: показується лише при першому запуску -->
-    <div class="coach" id="coach" hidden>
-      <div class="coach-card" role="status">
-        <div class="coach-demo" aria-hidden="true">
-          <span class="coach-trail"></span>
-          <img class="coach-paw" src="{{paw}}" alt="">
-        </div>
-        <p>Свайпни вліво, щоб відкрити тиждень, місяць і фокус</p>
-        <span class="coach-skip">Торкнись, щоб закрити</span>
-      </div>
-    </div>
   </div>
 
   <div class="scrim" id="scrim" hidden></div>
