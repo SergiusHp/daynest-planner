@@ -894,18 +894,27 @@ input.input[type="date"]::-webkit-datetime-edit,input.input[type="time"]::-webki
 
   // ---------- storage (per-browser) ----------
   const STORE = 'daynest-tasks-v1';
+  // перша задача для нового користувача
+  const WELCOME_TASK = 'Ознайомитись з програмою';
+  const firstTask = () => ({id:uid(), date:keyOf(today), text:WELCOME_TASK, time:'', done:false});
+  // демо-задачі зі старих версій (для наочності) — прибираємо один раз; власні плани користувача не чіпаємо
+  const DEMO = [['Прочитати 10 сторінок книги',''],['Прибрати робоче місце',''],['Підготувати слайди до зустрічі',''],
+    ['Дзвінок з командою','15:00'],['Зустріч із Сашком','10:00'],['Купити продукти',''],['Візит до стоматолога','09:30']];
+  const DEMO_CLEAN_KEY = 'daynest-demo-clean-v1';
+  function cleanDemo(list){
+    try { if (localStorage.getItem(DEMO_CLEAN_KEY) === '1') return list; localStorage.setItem(DEMO_CLEAN_KEY, '1'); } catch(e) { return list; }
+    const isDemo = t => DEMO.some(([x, tm]) => t.text === x && (t.time || '') === tm);
+    // прибираємо лише якщо це справді стартовий набір (знайдено щонайменше 4 з 7 демо-задач)
+    if (list.filter(isDemo).length < 4) return list;
+    const rest = list.filter(t => !isDemo(t));
+    if (!rest.some(t => t.text === WELCOME_TASK)) rest.unshift(firstTask());
+    try { localStorage.setItem(STORE, JSON.stringify(rest)); } catch(e) {}
+    return rest;
+  }
   function load(){
-    try { const raw = localStorage.getItem(STORE); if (raw) return JSON.parse(raw); } catch(e) {}
-    const k = n => keyOf(addDays(today, n));
-    return [
-      {id:uid(), date:k(0), text:'Прочитати 10 сторінок книги', time:'', done:false},
-      {id:uid(), date:k(0), text:'Прибрати робоче місце', time:'', done:false},
-      {id:uid(), date:k(0), text:'Підготувати слайди до зустрічі', time:'', done:true},
-      {id:uid(), date:k(0), text:'Дзвінок з командою', time:'15:00', done:false},
-      {id:uid(), date:k(1), text:'Зустріч із Сашком', time:'10:00', done:false},
-      {id:uid(), date:k(2), text:'Купити продукти', time:'', done:false},
-      {id:uid(), date:k(5), text:'Візит до стоматолога', time:'09:30', done:false},
-    ];
+    try { const raw = localStorage.getItem(STORE); if (raw) return cleanDemo(JSON.parse(raw)); } catch(e) {}
+    try { localStorage.setItem(DEMO_CLEAN_KEY, '1'); } catch(e) {}
+    return [firstTask()];
   }
   function save(){ try { localStorage.setItem(STORE, JSON.stringify(tasks)); } catch(e) {} if (typeof checkReminders === 'function') checkReminders(); }
 
