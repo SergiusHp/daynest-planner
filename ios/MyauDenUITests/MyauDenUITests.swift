@@ -37,7 +37,7 @@ final class MyauDenUITests: XCTestCase {
         app.buttons["obNext"].tap()
         XCTAssertTrue(app.staticTexts["dayTitle"].waitForExistence(timeout: 3))
         XCTAssertEqual(dayTitle(app), "Сьогоднішні справи")
-        XCTAssertTrue(app.staticTexts["Ознайомитись з програмою"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Ознайомитись з програмою")).firstMatch.waitForExistence(timeout: 3))
         shot(app, "05-day-first")
         app.terminate()
         let again = XCUIApplication()
@@ -75,8 +75,12 @@ final class MyauDenUITests: XCTestCase {
         let app = launch(["-uitest-skip-intro", "-uitest-seed-sample"])
         let check = app.switches["check-c"]
         XCTAssertTrue(check.waitForExistence(timeout: 5))
+        shot(app, "06b-day-sample")
         XCTAssertEqual(check.value as? String, "не виконано")
         app.buttons["task-c"].swipeRight()
+        // короткий тестовий свайп лише відкриває кнопку дії; повний свайп пальцем спрацьовує одразу
+        let action = app.buttons["Виконано"]
+        if action.waitForExistence(timeout: 1) { action.tap() }
         let done = NSPredicate(format: "value == %@", "виконано")
         expectation(for: done, evaluatedWith: app.switches["check-c"])
         waitForExpectations(timeout: 4)

@@ -254,10 +254,9 @@ struct CatDemo: View {
                 .overlay(RoundedRectangle(cornerRadius: 11).strokeBorder(Theme.accent, lineWidth: 2)))
             .padding(.top, 5)
             HStack(spacing: 8) {
-                Text("Скасувати").foregroundStyle(Theme.inkSoft).frame(maxWidth: .infinity, minHeight: 34)
-                Text("Додати").foregroundStyle(Theme.onAccent).frame(maxWidth: .infinity, minHeight: 34)
+                Text("Скасувати").foregroundStyle(Theme.inkSoft).frame(width: 85, height: 34)
+                Text("Додати").foregroundStyle(Theme.onAccent).frame(width: 171, height: 34)
                     .background(Capsule().fill(Theme.accent).background(Capsule().fill(Theme.accentDark).offset(y: 2)))
-                    .layoutPriority(1)
             }
             .font(.nunitoFixed(12, .extraBold))
             .padding(.top, 12)
