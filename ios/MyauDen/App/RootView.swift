@@ -51,9 +51,13 @@ struct MainPager: View {
         GeometryReader { geo in
             ScrollView(.horizontal) {
                 HStack(spacing: 0) {
+                    // невидимі сторінки ховаємо від VoiceOver (як inert у веб-версії)
                     DayPage().frame(width: geo.size.width, height: geo.size.height).id(0)
+                        .accessibilityHidden(store.page != 0)
                     CalendarPage().frame(width: geo.size.width, height: geo.size.height).id(1)
+                        .accessibilityHidden(store.page != 1)
                     FocusPage().frame(width: geo.size.width, height: geo.size.height).id(2)
+                        .accessibilityHidden(store.page != 2)
                 }
                 .scrollTargetLayout()
             }

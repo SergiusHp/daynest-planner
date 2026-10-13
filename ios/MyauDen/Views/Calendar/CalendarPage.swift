@@ -249,6 +249,8 @@ struct EventsList: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .animation(.easeOut(duration: 0.25), value: store.plans)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("eventsList")
     }
 
     private func rows(_ list: [Plan]) -> some View {
