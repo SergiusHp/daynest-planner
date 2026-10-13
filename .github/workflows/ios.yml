@@ -6,15 +6,46 @@ on:
 permissions:
   contents: write
 jobs:
-  probe:
+  build-test:
     runs-on: macos-15
+    timeout-minutes: 60
     steps:
-      - name: Збір інформації
+      - uses: actions/checkout@v4
+      - name: Збірка й тести
+        working-directory: ios
         run: |
-          mkdir -p out
-          { xcodebuild -version; xcrun simctl list runtimes; xcrun simctl list devices available | head -40; ls /Applications | grep -i xcode; } > out/report.txt 2>&1
+          mkdir -p ../out
+          xcodebuild -version > ../out/env.txt
+          set +e
+          xcodebuild -project MyauDen.xcodeproj -scheme MyauDen \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -resultBundlePath ../out/R.xcresult \
+            CODE_SIGNING_ALLOWED=NO test > ../out/xcodebuild.log 2>&1
+          echo "exit=$?" > ../out/status.txt
+          set -e
+          grep -E "error:|warning: .*deprecated|Test Case .*(passed|failed)|\*\* (TEST|BUILD) (SUCCEEDED|FAILED)|XCTAssert|failed -" ../out/xcodebuild.log | head -300 > ../out/summary.txt || true
+          tail -80 ../out/xcodebuild.log > ../out/tail.txt
+      - name: Знімки екранів
+        if: always()
+        run: |
+          mkdir -p out/shots
+          xcrun xcresulttool export attachments --path out/R.xcresult --output-path out/shots > out/attach.log 2>&1 || true
+          cd out/shots && if [ -f manifest.json ]; then python3 - <<'PY'
+          import json, os
+          m = json.load(open('manifest.json'))
+          for t in m:
+              for a in t.get('attachments', []):
+                  src = a.get('exportedFileName'); name = a.get('suggestedHumanReadableName', src)
+                  if src and os.path.exists(src):
+                      base = name.split('_')[0] if name else src
+                      os.rename(src, base + os.path.splitext(src)[1])
+          PY
+          fi
+          ls -la
       - name: Публікація результатів у гілку ci-results
+        if: always()
         run: |
+          rm -rf out/R.xcresult
           cd out
           git init -q && git checkout -q -b ci-results
           git config user.email ci@example.com && git config user.name ci
