@@ -34,13 +34,34 @@ jobs:
             -resultBundlePath ../out/R.xcresult \
             CODE_SIGNING_ALLOWED=NO test > ../out/xcodebuild.log 2>&1
           echo "exit=$?" > ../out/status.txt
+          # малий екран: iPhone SE
+          SE=$(xcrun simctl list devices available | grep -m1 "iPhone SE" | grep -oE "[0-9A-F-]{36}")
+          xcodebuild -project MyauDen.xcodeproj -scheme MyauDen -destination "id=$SE" \
+            -resultBundlePath ../out/SE.xcresult -only-testing:MyauDenUITests/MyauDenUITests/testScreensOverview \
+            CODE_SIGNING_ALLOWED=NO test > ../out/se.log 2>&1
+          echo "se=$?" >> ../out/status.txt
+          # Release-збірка для пристрою (як для App Store), без підпису
+          xcodebuild -project MyauDen.xcodeproj -scheme MyauDen -configuration Release \
+            -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build > ../out/release.log 2>&1
+          echo "release=$?" >> ../out/status.txt
+          grep -E "error:|warning:" ../out/release.log | grep -v appintents | head -50 > ../out/release-summary.txt || true
           set -e
           grep -E "error:|warning: .*deprecated|Test Case .*(passed|failed)|\*\* (TEST|BUILD) (SUCCEEDED|FAILED)|XCTAssert|failed -" ../out/xcodebuild.log | head -300 > ../out/summary.txt || true
           tail -80 ../out/xcodebuild.log > ../out/tail.txt
       - name: Знімки екранів
         if: always()
         run: |
-          mkdir -p out/shots
+          mkdir -p out/shots out/se
+          xcrun xcresulttool export attachments --path out/SE.xcresult --output-path out/se > out/attach-se.log 2>&1 || true
+          (cd out/se && python3 -c "
+          import json,os
+          for t in json.load(open('manifest.json')):
+              for a in t.get('attachments',[]):
+                  s=a.get('exportedFileName'); n=a.get('suggestedHumanReadableName') or s
+                  if s and s.endswith('.png') and os.path.exists(s): os.rename(s,'se-'+n.split('_')[0]+'.png')
+                  elif s and os.path.exists(s): os.remove(s)
+          " || true)
+          rm -rf out/SE.xcresult
           xcrun xcresulttool export attachments --path out/R.xcresult --output-path out/shots > out/attach.log 2>&1 || true
           cd out/shots && if [ -f manifest.json ]; then python3 - <<'PY'
           import json, os

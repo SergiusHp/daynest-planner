@@ -178,4 +178,17 @@ final class MyauDenUITests: XCTestCase {
         app.buttons["obNext"].tap(); sleep(1); shot(app, "14-rm-2")
         app.buttons["obNext"].tap(); sleep(1); shot(app, "15-rm-3")
     }
+
+    // Знімки основних екранів (запускається й на малому iPhone SE).
+    func testScreensOverview() throws {
+        let app = launch(["-uitest-skip-intro", "-uitest-seed-sample"])
+        XCTAssertTrue(app.staticTexts["dayTitle"].waitForExistence(timeout: 5))
+        shot(app, "20-day")
+        app.swipeLeft(); sleep(1); shot(app, "21-calendar")
+        app.swipeLeft(); sleep(1); shot(app, "22-focus")
+        let onboarding = launch([])
+        XCTAssertTrue(onboarding.buttons["startButton"].waitForExistence(timeout: 5))
+        shot(onboarding, "23-welcome")
+        onboarding.buttons["startButton"].tap(); sleep(2); shot(onboarding, "24-onboarding")
+    }
 }
