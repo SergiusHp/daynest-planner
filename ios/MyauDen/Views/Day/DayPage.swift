@@ -25,6 +25,8 @@ struct DayPage: View {
                         Text(title)
                             .font(.nunito(26, .extraBold, relativeTo: .largeTitle))
                             .foregroundStyle(Theme.ink)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                             .accessibilityAddTraits(.isHeader)
                             .accessibilityIdentifier("dayTitle")
                         Text(subtitle)

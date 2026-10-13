@@ -77,11 +77,14 @@ final class MyauDenUITests: XCTestCase {
         XCTAssertTrue(check.waitForExistence(timeout: 5))
         shot(app, "06b-day-sample")
         XCTAssertEqual(check.value as? String, "не виконано")
-        app.buttons["task-c"].swipeRight()
-        // короткий тестовий свайп лише відкриває кнопку дії; повний свайп пальцем спрацьовує одразу
-        let action = app.buttons["Виконано"]
-        if action.waitForExistence(timeout: 1) { action.tap() }
         let done = NSPredicate(format: "value == %@", "виконано")
+        for _ in 0..<2 where (app.switches["check-c"].value as? String) != "виконано" {
+            app.buttons["task-c"].swipeRight()
+            // короткий тестовий свайп може лише відкрити кнопку дії; повний свайп пальцем спрацьовує одразу
+            let action = app.buttons["Виконано"]
+            if action.waitForExistence(timeout: 1.5) { action.tap() }
+            sleep(1)
+        }
         expectation(for: done, evaluatedWith: app.switches["check-c"])
         waitForExpectations(timeout: 4)
         sleep(1); shot(app, "07-day-scratched")
@@ -190,5 +193,6 @@ final class MyauDenUITests: XCTestCase {
         XCTAssertTrue(onboarding.buttons["startButton"].waitForExistence(timeout: 5))
         shot(onboarding, "23-welcome")
         onboarding.buttons["startButton"].tap(); sleep(2); shot(onboarding, "24-onboarding")
+        onboarding.buttons["obNext"].tap(); sleep(2); shot(onboarding, "25-onboarding-2")
     }
 }

@@ -18,12 +18,16 @@ struct WelcomeView: View {
                 .accessibilityLabel("Мій МЯУдень")
                 .accessibilityAddTraits(.isHeader)
 
-            Image("Welcome")
-                .resizable()
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                .clipped()
-                .accessibilityLabel("Людина з великим олівцем піднімається сходинками: ідеї, план, виконання")
+            GeometryReader { g in
+                Image("Welcome")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: g.size.width, height: g.size.height, alignment: .bottom)
+                    .clipped()
+            }
+            .accessibilityElement()
+            .accessibilityLabel("Людина з великим олівцем піднімається сходинками: ідеї, план, виконання")
+            .accessibilityAddTraits(.isImage)
 
             Button("Розпочати", action: onStart)
                 .buttonStyle(.creamLedge)

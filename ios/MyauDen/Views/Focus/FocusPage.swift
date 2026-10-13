@@ -6,6 +6,14 @@ struct FocusPage: View {
     @Environment(FocusModel.self) private var focus
     @Environment(\.rootInsets) private var insets
 
+    @State private var pageHeight: CGFloat = 800
+
+    /// Ширина циферблата: на низьких екранах (iPhone SE) менша, щоб кнопки не ховалися під крапками сторінок.
+    private var dialWidth: CGFloat {
+        let free = pageHeight - insets.top - insets.bottom - 400
+        return max(240, min(380, free * 352 / 304))
+    }
+
     var body: some View {
         @Bindable var focus = focus
         ScrollView {
@@ -25,6 +33,7 @@ struct FocusPage: View {
                 .padding(.horizontal, 56)       // місце для кнопки-ноти праворуч
 
                 DialView()
+                    .frame(maxWidth: dialWidth)
                     .padding(.horizontal, -10)
 
                 Presets()
@@ -55,6 +64,7 @@ struct FocusPage: View {
         .scrollIndicators(.hidden)
         .scrollBounceBehavior(.basedOnSize)
         .background(Theme.calTop)
+        .background(GeometryReader { g in Color.clear.onAppear { pageHeight = g.size.height } })
         .overlay(alignment: .topTrailing) {
             MusicButton()
                 .padding(.trailing, 16)
