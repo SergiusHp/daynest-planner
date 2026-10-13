@@ -6,20 +6,68 @@ struct TaskRow: View {
     @Environment(\.reduceMotion) private var reduceMotion
     let plan: Plan
 
+    // свайп зліва направо: рядок їде за пальцем, кіготь поступово «проводиться» по тексту
+    private enum DragPhase { case idle, claimed, rejected }
+    @State private var dragX: CGFloat = 0
+    @State private var phase: DragPhase = .idle
+    @State private var previewStyle = Int.random(in: 0..<Scratch.styles)
+    @GestureState private var touching = false
+    private let threshold: CGFloat = 70
+
     var body: some View {
         let started = store.scratchStarted[plan.id]
-        let style = store.scratchStyle(of: plan)
+        let style = plan.done ? store.scratchStyle(of: plan) : previewStyle
+        let progress = min(1, dragX / threshold)
         // поки йде анімація — оновлюємо рядок щокадру; потім він статичний
         TimelineView(.animation(paused: started == nil || reduceMotion)) { ctx in
             let elapsed: Double? = (plan.done && !reduceMotion) ? started.map { ctx.date.timeIntervalSince($0) } : nil
             let live = elapsed.map { $0 < 1.6 } ?? false
-            content(style: style, elapsed: live ? elapsed : nil)
+            // під час свайпу: невиконана — подряпини з'являються, виконана — зникають
+            let scrub: Double? = dragX > 0 ? Double(plan.done ? 1 - progress : progress) : nil
+            content(style: style, elapsed: live ? elapsed : nil, scrub: scrub)
                 .modifier(RowShake(style: style, elapsed: live ? elapsed : nil))
         }
+        .offset(x: dragX * 0.6)
+        .simultaneousGesture(swipe)
+        .onChange(of: touching) { _, now in if !now { finishDrag(commit: false) } }
+        .accessibilityAction(named: plan.done ? "Повернути" : "Виконано") { store.toggle(plan.id) }
+    }
+
+    private var swipe: some Gesture {
+        DragGesture(minimumDistance: 8)
+            .updating($touching) { _, state, _ in state = true }
+            .onChanged { g in
+                let dx = g.translation.width, dy = g.translation.height
+                if phase == .idle {
+                    if dx > 8 && dx > abs(dy) * 1.2 {
+                        phase = .claimed
+                        store.pagerLocked = true          // сторінки не гортаються, поки ведемо справу
+                    } else if abs(dy) > 8 || dx < -8 {
+                        phase = .rejected                 // вертикальна прокрутка або свайп уліво — не наш жест
+                    }
+                }
+                guard phase == .claimed else { return }
+                let x = max(0, dx)
+                if dragX < threshold && x >= threshold { Haptics.tick() }
+                dragX = x
+            }
+            .onEnded { _ in finishDrag(commit: true) }
+    }
+
+    private func finishDrag(commit: Bool) {
+        if phase == .claimed {
+            if commit && dragX >= threshold {
+                store.toggle(plan.id, style: plan.done ? nil : previewStyle, animate: false)
+                previewStyle = Int.random(in: 0..<Scratch.styles)
+            }
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.8)) { dragX = 0 }
+        }
+        phase = .idle
+        if store.pagerLocked { store.pagerLocked = false }
     }
 
     @ViewBuilder
-    private func content(style: Int, elapsed: Double?) -> some View {
+    private func content(style: Int, elapsed: Double?, scrub: Double?) -> some View {
         HStack(alignment: .top, spacing: 16) {
             Button {
                 store.toggle(plan.id)
@@ -47,9 +95,9 @@ struct TaskRow: View {
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                         .overlay(alignment: .topLeading) {
-                            if plan.done {
+                            if plan.done || scrub != nil {
                                 GeometryReader { g in
-                                    ScratchOverlay(key: plan.id, style: style, size: g.size, elapsed: elapsed)
+                                    ScratchOverlay(key: plan.id, style: style, size: g.size, elapsed: elapsed, scrub: scrub)
                                 }
                             }
                         }
@@ -69,6 +117,7 @@ struct TaskRow: View {
             .accessibilityIdentifier("task-\(plan.id)")
         }
         .padding(.vertical, 14)
+        .contentShape(Rectangle())
         .opacity(plan.done ? 0.5 : 1)
         .animation(.easeOut(duration: 0.35), value: plan.done)
     }
@@ -97,16 +146,19 @@ struct ScratchOverlay: View {
     let style: Int
     let size: CGSize
     let elapsed: Double?
+    var scrub: Double? = nil          // 0…1 — показати частку анімації (під час свайпу)
     private let margin: CGFloat = 24
 
     var body: some View {
         let claws = Scratch.claws(style: style, key: key, size: size)
+        let total = claws.map { $0.delay + $0.duration }.max() ?? 0.4
+        let shown: Double? = scrub.map { $0 * total } ?? elapsed
         let w = max(36, size.width), h = size.height + Scratch.pad * 2
         ZStack(alignment: .topLeading) {
-            ScratchCanvas(claws: claws, elapsed: elapsed, inset: margin)
+            ScratchCanvas(claws: claws, elapsed: shown, inset: margin)
                 .frame(width: w + margin * 2, height: h + margin * 2)
                 .offset(x: -margin, y: -Scratch.pad - margin)
-            if let elapsed {
+            if let elapsed, scrub == nil {
                 Crumbs(key: key, style: style, size: size, elapsed: elapsed)
             }
         }

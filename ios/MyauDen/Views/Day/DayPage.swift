@@ -78,7 +78,7 @@ struct DayPage: View {
     }
 }
 
-/// Список справ із нативним свайпом зліва направо: закреслити / повернути.
+/// Список справ; свайп по справі зліва направо — закреслити / повернути (див. TaskRow).
 struct TaskList: View {
     @Environment(AppStore.self) private var store
     let plans: [Plan]
@@ -94,15 +94,6 @@ struct TaskList: View {
                         .listRowSeparatorTint(Theme.divider)
                         .listRowSeparator(plan.id == plans.first?.id ? .hidden : .visible, edges: .top)
                         .listRowSeparator(plan.id == plans.last?.id ? .hidden : .visible, edges: .bottom)
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            Button {
-                                store.toggle(plan.id)
-                            } label: {
-                                Label(plan.done ? "Повернути" : "Виконано",
-                                      systemImage: plan.done ? "arrow.uturn.backward" : "checkmark")
-                            }
-                            .tint(plan.done ? Theme.inkMuted : Theme.accent)
-                        }
                 }
             }
             .listStyle(.plain)

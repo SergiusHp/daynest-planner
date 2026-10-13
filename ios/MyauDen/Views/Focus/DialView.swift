@@ -4,6 +4,7 @@ import SwiftUI
 /// У режимі фокусу шкала ховається, мордочка збільшується, а кільце показує, скільки часу лишилось.
 struct DialView: View {
     @Environment(FocusModel.self) private var focus
+    @Environment(AppStore.self) private var store
     @Environment(\.reduceMotion) private var reduceMotion
     @State private var gestureMode: GestureMode?
     @State private var hop = false
@@ -129,13 +130,14 @@ struct DialView: View {
                     let r = hypot(p.x - 150, p.y - 150)
                     if r < (focus.inFocus ? 110 : 66) { gestureMode = .tap }
                     else if focus.running || r > 152 { gestureMode = .ignore }
-                    else { gestureMode = .knob }
+                    else { gestureMode = .knob; store.pagerLocked = true }
                 }
                 if gestureMode == .knob { focus.setMinutes(minutes(at: toBox(g.location))) }
             }
             .onEnded { g in
                 if gestureMode == .tap && hypot(g.translation.width, g.translation.height) < 12 { focus.playPause() }
                 gestureMode = nil
+                store.pagerLocked = false
             }
     }
 

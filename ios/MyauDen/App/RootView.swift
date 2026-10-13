@@ -40,18 +40,33 @@ struct RootView: View {
 }
 
 /// Три сторінки, що гортаються свайпом: день → тиждень/місяць → фокус.
+/// Гортання блокується, поки палець веде справу вправо чи крутить лапку таймера — жести не конфліктують.
 struct MainPager: View {
     @Environment(AppStore.self) private var store
     @Environment(\.rootInsets) private var insets
+    @State private var scrolled: Int? = 0
 
     var body: some View {
         @Bindable var store = store
-        TabView(selection: $store.page) {
-            DayPage().tag(0)
-            CalendarPage().tag(1)
-            FocusPage().tag(2)
+        GeometryReader { geo in
+            ScrollView(.horizontal) {
+                HStack(spacing: 0) {
+                    DayPage().frame(width: geo.size.width, height: geo.size.height).id(0)
+                    CalendarPage().frame(width: geo.size.width, height: geo.size.height).id(1)
+                    FocusPage().frame(width: geo.size.width, height: geo.size.height).id(2)
+                }
+                .scrollTargetLayout()
+            }
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: $scrolled)
+            .scrollIndicators(.hidden)
+            .scrollDisabled(store.pagerLocked)
+            .onChange(of: scrolled) { _, v in if let v, v != store.page { store.page = v } }
+            .onChange(of: store.page) { _, v in
+                if scrolled != v { withAnimation(.spring(response: 0.38, dampingFraction: 0.9)) { scrolled = v } }
+            }
+            .onAppear { scrolled = store.page }
         }
-        .tabViewStyle(.page(indexDisplayMode: .never))
         .background(Theme.day)
         .overlay(alignment: .bottom) {
             PageDots(page: $store.page)

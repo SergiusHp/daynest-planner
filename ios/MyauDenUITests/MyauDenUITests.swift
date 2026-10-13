@@ -77,18 +77,31 @@ final class MyauDenUITests: XCTestCase {
         XCTAssertTrue(check.waitForExistence(timeout: 5))
         shot(app, "06b-day-sample")
         XCTAssertEqual(check.value as? String, "не виконано")
-        let done = NSPredicate(format: "value == %@", "виконано")
-        for _ in 0..<2 where (app.switches["check-c"].value as? String) != "виконано" {
-            app.buttons["task-c"].swipeRight()
-            // короткий тестовий свайп може лише відкрити кнопку дії; повний свайп пальцем спрацьовує одразу
-            let action = app.buttons["Виконано"]
-            if action.waitForExistence(timeout: 1.5) { action.tap() }
-            sleep(1)
+        // повільний свайп пальцем, як у житті: натиснути й провести вправо
+        func swipeRight(_ id: String) {
+            let row = app.buttons["task-\(id)"]
+            let start = row.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.5))
+            start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 200, dy: 0)), withVelocity: .slow, thenHoldForDuration: 0.05)
         }
+        swipeRight("c")
+        let done = NSPredicate(format: "value == %@", "виконано")
         expectation(for: done, evaluatedWith: app.switches["check-c"])
+        waitForExpectations(timeout: 4)
+        // надійність: ще дві справи поспіль
+        swipeRight("a")
+        expectation(for: done, evaluatedWith: app.switches["check-a"])
+        waitForExpectations(timeout: 4)
+        sleep(2)
+        swipeRight("b")
+        expectation(for: done, evaluatedWith: app.switches["check-b"])
         waitForExpectations(timeout: 4)
         sleep(1); shot(app, "07-day-scratched")
         XCTAssertEqual(dayTitle(app), "Сьогоднішні справи")      // сторінка не змінилася
+        sleep(2)
+        swipeRight("d")                                            // свайп по виконаній — повертає
+        let undone = NSPredicate(format: "value == %@", "не виконано")
+        expectation(for: undone, evaluatedWith: app.switches["check-d"])
+        waitForExpectations(timeout: 4)
     }
 
     // Котик відкриває «Новий план»; план додається до списку.

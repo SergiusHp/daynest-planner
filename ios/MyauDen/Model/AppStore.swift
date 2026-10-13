@@ -28,6 +28,8 @@ final class AppStore {
     var cursor: Date = DayKey.firstOfMonth(Date())        // місяць, показаний у календарі
     var sheet: SheetTarget?
     var justAdded: String?
+    /// Тимчасово заборонити гортання сторінок (поки палець веде справу чи лапку таймера).
+    var pagerLocked = false
 
     /// Справи, що саме зараз «зацарапуються»: до кінця анімації лишаються на своєму місці у списку.
     var settling: Set<String> = []
@@ -131,17 +133,20 @@ final class AppStore {
 
     /// Закреслити / повернути справу. Повертає тривалість анімації подряпин (сек).
     @discardableResult
-    func toggle(_ id: String) -> Double {
+    func toggle(_ id: String, style chosen: Int? = nil, animate: Bool = true) -> Double {
         guard let i = plans.firstIndex(where: { $0.id == id }) else { return 0 }
         let becomesDone = !plans[i].done
         plans[i].done = becomesDone
         plans[i].doneAt = becomesDone ? Date().timeIntervalSince1970 * 1000 : 0
         var wait = 0.38
         if becomesDone {
-            let style = pickScratch()
+            let style = chosen ?? pickScratch()
+            lastScratch = style
             plans[i].scratch = style
-            scratchStarted[id] = Date()
-            wait = Scratch.duration(style: style, key: id, text: plans[i].text) + 0.32
+            if animate {
+                scratchStarted[id] = Date()
+                wait = Scratch.duration(style: style, key: id, text: plans[i].text) + 0.32
+            }   // після свайпу подряпини вже «проведені» пальцем — анімацію не повторюємо
             Haptics.success()
         } else {
             scratchStarted[id] = nil
@@ -152,11 +157,12 @@ final class AppStore {
         // кіт «дозацарапує», і лише тоді справа переїжджає вниз (або назад угору)
         DispatchQueue.main.asyncAfter(deadline: .now() + wait) { [weak self] in
             withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) { _ = self?.settling.remove(id) }
+            self?.scratchStarted[id] = nil          // анімацію завершено — далі подряпини статичні
         }
         return wait
     }
 
-    private func pickScratch() -> Int {
+    func pickScratch() -> Int {
         var s: Int
         repeat { s = Int.random(in: 0..<Scratch.styles) } while s == lastScratch
         lastScratch = s
