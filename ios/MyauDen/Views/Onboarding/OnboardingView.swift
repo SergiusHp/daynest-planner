@@ -165,7 +165,10 @@ struct HandView: View {
 }
 
 struct MiniHeader: View {
-    var titleA: String? = nil, titleB: String, dateA: String? = nil, dateB: String
+    var titleA: String? = nil
+    var titleB: String
+    var dateA: String? = nil
+    var dateB: String
     var mixB: Double = 1          // 0 — показано A, 1 — показано B
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {

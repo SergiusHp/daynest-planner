@@ -66,9 +66,8 @@ struct JellyArrow: View {
         Button(action: action) {
             TimelineView(.animation(paused: reduceMotion)) { ctx in
                 let t = reduceMotion ? 0 : loopPhase(ctx.date, start: start, duration: 2.8)
-                let ks: (Double, Double, Double, Double, Double)
                 // (зсув x, зсув y, масштаб x, масштаб y, поворот)
-                ks = (
+                let ks: (Double, Double, Double, Double, Double) = (
                     track([Key(0, 0, .inOut), Key(0.2, 3, .inOut), Key(0.45, 6, .inOut), Key(0.7, 2, .inOut), Key(1, 0)], t),
                     track([Key(0, 0, .inOut), Key(0.2, -2, .inOut), Key(0.45, 0, .inOut), Key(0.7, 2, .inOut), Key(1, 0)], t),
                     track([Key(0, 1, .inOut), Key(0.2, 1.1, .inOut), Key(0.45, 0.93, .inOut), Key(0.7, 1.05, .inOut), Key(1, 1)], t),
