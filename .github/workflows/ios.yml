@@ -1,0 +1,10 @@
+name: iOS
+on:
+  push:
+    branches: [ios]
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: macos-15
+    steps:
+      - run: xcodebuild -version && xcrun simctl list runtimes | head -20 && ls /Applications | grep -i xcode
