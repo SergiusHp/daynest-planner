@@ -1,0 +1,80 @@
+    t =     8.79s     Find the "task-a" Button
+    t =     8.92s     Check for interrupting elements affecting "task-a" Button
+    t =     8.99s     Synthesize event
+    t =     9.00s         Find the "task-a" Button
+    t =     9.07s         Find the "task-a" Button
+    t =     9.15s         Find the "task-a" Button
+    t =     9.21s         Find the "task-a" Button
+    t =     9.28s         Find the "task-a" Button
+    t =    10.50s     Wait for com.sergiushp.myauden to idle
+    t =    11.51s Checking `Expect predicate `value == "виконано"` for object "check-a" Switch`
+    t =    11.51s     Find the "check-a" Switch
+    t =    13.57s Press "task-b" Button[0.15, 0.50] for 0.1 seconds, then drag to "task-b" Button[0.15, 0.50] -> (200.0, 0.0) with velocity of 250.00 pixels per second, and then hold for 0.1 seconds 
+    t =    13.57s     Wait for com.sergiushp.myauden to idle
+    t =    13.58s     Find the "task-b" Button
+    t =    13.67s     Check for interrupting elements affecting "task-b" Button
+    t =    13.74s     Synthesize event
+    t =    13.74s         Find the "task-b" Button
+    t =    13.82s         Find the "task-b" Button
+    t =    13.90s         Find the "task-b" Button
+    t =    14.00s         Find the "task-b" Button
+    t =    14.06s         Find the "task-b" Button
+    t =    15.31s     Wait for com.sergiushp.myauden to idle
+    t =    16.38s Checking `Expect predicate `value == "виконано"` for object "check-b" Switch`
+    t =    16.38s     Find the "check-b" Switch
+    t =    17.47s Find the Target Application 'com.sergiushp.myauden'
+    t =    17.87s Added attachment named '07-day-scratched'
+    t =    17.89s Find the "dayTitle" StaticText
+    t =    20.04s Press "task-d" Button[0.15, 0.50] for 0.1 seconds, then drag to "task-d" Button[0.15, 0.50] -> (200.0, 0.0) with velocity of 250.00 pixels per second, and then hold for 0.1 seconds 
+    t =    20.04s     Wait for com.sergiushp.myauden to idle
+    t =    20.05s     Find the "task-d" Button
+    t =    20.13s     Check for interrupting elements affecting "task-d" Button
+    t =    20.19s     Synthesize event
+    t =    20.19s         Find the "task-d" Button
+    t =    20.29s         Find the "task-d" Button
+    t =    20.36s         Find the "task-d" Button
+    t =    20.45s         Find the "task-d" Button
+    t =    20.52s         Find the "task-d" Button
+    t =    21.78s     Wait for com.sergiushp.myauden to idle
+    t =    22.83s Checking `Expect predicate `value == "не виконано"` for object "check-d" Switch`
+    t =    22.83s     Find the "check-d" Switch
+    t =    22.89s Tear Down
+Test Case '-[MyauDenUITests.MyauDenUITests testSwipeRightCompletesTask]' passed (23.128 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testVerticalScrollKeepsPage]' started.
+    t =     0.00s Start Test at 2026-10-13 17:15:19.303
+    t =     0.03s Set Up
+    t =     0.04s Open com.sergiushp.myauden
+    t =     0.04s     Launch com.sergiushp.myauden
+    t =     0.04s         Terminate com.sergiushp.myauden:9850
+    t =     1.51s         Setting up automation session
+    t =     2.97s         Wait for com.sergiushp.myauden to idle
+    t =     4.87s Waiting 5.0s for "task-t1" Button to exist
+    t =     5.88s     Checking `Expect predicate `existsNoRetry == 1` for object "task-t1" Button`
+    t =     5.88s         Checking existence of `"task-t1" Button`
+    t =     6.14s Find the "task-t1" Button
+    t =     6.22s Swipe up "taskList" CollectionView
+    t =     6.22s     Wait for com.sergiushp.myauden to idle
+    t =     6.23s     Find the "taskList" CollectionView
+    t =     6.33s     Check for interrupting elements affecting "taskList" CollectionView
+    t =     6.40s     Synthesize event
+    t =     6.89s     Wait for com.sergiushp.myauden to idle
+    t =    10.01s Find the "dayTitle" StaticText
+    t =    10.17s Checking existence of `"task-t1" Button`
+    t =    10.23s Tear Down
+Test Case '-[MyauDenUITests.MyauDenUITests testVerticalScrollKeepsPage]' passed (10.473 seconds).
+Test Suite 'MyauDenUITests' passed at 2026-10-13 17:15:29.776.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 275.938 (275.953) seconds
+Test Suite 'MyauDenUITests.xctest' passed at 2026-10-13 17:15:29.777.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 275.938 (275.954) seconds
+Test Suite 'All tests' passed at 2026-10-13 17:15:29.777.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 275.938 (275.955) seconds
+2026-10-13 17:15:31.481 xcodebuild[2244:10120] [MT] IDETestOperationsObserverDebug: 401.248 elapsed -- Testing started completed.
+2026-10-13 17:15:31.481 xcodebuild[2244:10120] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-13 17:15:31.481 xcodebuild[2244:10120] [MT] IDETestOperationsObserverDebug: 401.248 sec, +401.248 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/daynest-planner/daynest-planner/out/R.xcresult
+
+** TEST SUCCEEDED **
+
+Testing started

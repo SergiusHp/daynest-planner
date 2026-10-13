@@ -1,0 +1,44 @@
+Exported 2 attachments for: MyauDenUITests/testAddPlanViaCat():
+File: 9A0397B0-0C34-4719-9ACB-F4ADB03175D2.png, suggested name: "08b-added_0_09FC6CAD-5DFD-404B-9BD5-9191DF7E304E.png"
+File: 3C2A1353-CDCC-4785-BA6E-BEA34FFC41C2.png, suggested name: "08-new-plan_0_87CCAE4E-2D03-462F-842E-5F7EF487183B.png"
+
+Exported 2 attachments for: MyauDenUITests/testCalendarHidesDone():
+File: F972860E-2A88-404C-9583-D5972EA2DB70.png, suggested name: "10-calendar-week_0_7B96AA57-9754-4611-B485-E720858929C3.png"
+File: A3A93493-20EB-4F29-A71E-E64B1C3B776A.png, suggested name: "09-calendar-month_0_3C2FFE89-BE75-47C6-B3B9-2A589D2E681E.png"
+
+Exported 5 attachments for: MyauDenUITests/testFirstLaunchFlow():
+File: C50171AB-36F3-4B86-A38D-6D35C4F98EDF.png, suggested name: "05-day-first_0_59AF5A97-7446-4F5D-8BCD-0FE7F32AEB08.png"
+File: 68FCD48D-F535-4C0E-8861-A0FA21F34CE7.png, suggested name: "04-onboarding-3_0_8498B4FC-5BF2-479D-9B8A-85137AD2A86C.png"
+File: 23A5538A-AD96-49C0-9679-D288114983B2.png, suggested name: "03-onboarding-2_0_8A8284DE-AB80-47C9-8625-89008BEF9ABF.png"
+File: 85941738-EE86-40D4-A914-F69B4C389144.png, suggested name: "02-onboarding-1_0_B4E8E926-901B-4ABD-81C4-E638EB354879.png"
+File: 2B96783E-9C9C-4D33-BC19-C889797EE7F4.png, suggested name: "01-welcome_0_F97C520A-1B6C-4255-A64D-D7567D0E39FF.png"
+
+Exported 2 attachments for: MyauDenUITests/testFocusDialAndMusic():
+File: BC595811-379C-4A40-B809-ACE5829686C0.png, suggested name: "12-focus-running_0_631E5301-727B-47FB-9908-888D38F346AA.png"
+File: 98B8ECAE-0F24-4A8D-AD2B-B53916223CD4.png, suggested name: "11-focus_0_326B2DFB-EDCD-454E-95FE-1E172FD640BF.png"
+
+Exported 3 attachments for: MyauDenUITests/testReducedMotionOnboarding():
+File: B6AE8DEB-ADBA-4282-B560-A8C3C30C9015.png, suggested name: "15-rm-3_0_4DC977B9-D052-4CB6-A927-55D34D3BDAA5.png"
+File: BBD460E0-FF40-45B5-A3D7-C8980FB11912.png, suggested name: "14-rm-2_0_496E4364-0F36-4508-8469-3F89374D824D.png"
+File: C25DFB89-AC01-43A5-8CCD-BCD3729E00C6.png, suggested name: "13-rm-1_0_F4E5B1F5-FE52-47E4-B83C-0C2E5FB22E9D.png"
+
+Exported 6 attachments for: MyauDenUITests/testScreensOverview():
+File: 0103D0D3-6428-4F8D-8017-5D85C6D2B114.png, suggested name: "25-onboarding-2_0_955864DE-3268-4423-82F1-3D10E93725B0.png"
+File: 62EDD7EA-AA95-4986-B9EC-5A067B21FE20.png, suggested name: "24-onboarding_0_C603F8C2-B61C-4849-9855-77995DA64302.png"
+File: 49CA9AC3-24FB-408E-B828-F48C1CBE2B83.png, suggested name: "23-welcome_0_53FA102A-31C2-491A-B1E9-F4B3638FB21E.png"
+File: 9E169017-31D5-4396-AE5B-154F9EDB4D9E.png, suggested name: "22-focus_0_07101BFE-1AD6-4D5D-9533-87C6EFDB61BF.png"
+File: 2BF27F77-907D-4FBE-94F4-F2147B97F211.png, suggested name: "21-calendar_0_EF470242-E5B6-4963-96D3-B32E4280FB3C.png"
+File: 6004737D-91A8-4262-9E7A-D4637FAB2A09.png, suggested name: "20-day_0_B23CE7F5-996A-40DA-B248-98F42D5BFA65.png"
+
+Skipped export for MyauDenUITests/testSunReturnsToToday(): no matching attachments
+
+Exported 1 attachment for: MyauDenUITests/testSwipeLeftOverTaskOpensCalendar():
+File: FBE0B24B-4797-40C2-A7FA-A3E98AD9B52F.png, suggested name: "06-day-many_0_B15FDD1F-6916-4CDA-A35E-5E7DBFACE3AD.png"
+
+Exported 2 attachments for: MyauDenUITests/testSwipeRightCompletesTask():
+File: 0EBF102C-7AE4-4E8C-B5CB-DE3EA910A063.png, suggested name: "07-day-scratched_0_8C84092B-2142-42FC-825D-3B55B99BB5D1.png"
+File: 3EB071FF-7396-4DAF-AEFB-E81613525070.png, suggested name: "06b-day-sample_0_A3EA89F3-2AC6-4B74-8C19-FE1E7762C916.png"
+
+Skipped export for MyauDenUITests/testVerticalScrollKeepsPage(): no matching attachments
+
+Generated manifest file with attachment details: /Users/runner/work/daynest-planner/daynest-planner/out/shots/manifest.json

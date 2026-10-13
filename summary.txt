@@ -1,0 +1,11 @@
+Test Case '-[MyauDenUITests.MyauDenUITests testAddPlanViaCat]' passed (62.265 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testCalendarHidesDone]' passed (57.485 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testFirstLaunchFlow]' passed (48.595 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testFocusDialAndMusic]' passed (23.691 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testReducedMotionOnboarding]' passed (11.851 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testScreensOverview]' passed (21.297 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testSunReturnsToToday]' passed (8.752 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testSwipeLeftOverTaskOpensCalendar]' passed (8.400 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testSwipeRightCompletesTask]' passed (23.128 seconds).
+Test Case '-[MyauDenUITests.MyauDenUITests testVerticalScrollKeepsPage]' passed (10.473 seconds).
+** TEST SUCCEEDED **
