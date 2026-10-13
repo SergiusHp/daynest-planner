@@ -49,7 +49,7 @@ struct CalendarPage: View {
         .overlay(alignment: .bottomTrailing) {
             JellyArrow { withAnimation(.spring(response: 0.38, dampingFraction: 0.9)) { store.page = 2 } }
                 .padding(.trailing, 12)
-                .padding(.bottom, insets.bottom + 4)
+                .padding(.bottom, max(insets.bottom - 12, 6))
                 .accessibilityLabel("Відкрити фокус")
         }
     }

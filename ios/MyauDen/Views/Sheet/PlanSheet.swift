@@ -129,16 +129,18 @@ struct PlanSheet: View {
                     }
                 }
 
-                HStack(spacing: 12) {
-                    Button("Скасувати") { dismiss() }
-                        .buttonStyle(LedgeButtonStyle(fill: .clear, text: Theme.inkSoft, ledge: .clear))
-                        .frame(maxWidth: .infinity)
-                    Button(editing == nil ? "Додати" : "Зберегти", action: save)
-                        .buttonStyle(.primaryLedge)
-                        .frame(maxWidth: .infinity)
-                        .layoutPriority(1)
-                        .accessibilityIdentifier("savePlan")
+                GeometryReader { g in
+                    HStack(spacing: 12) {
+                        Button("Скасувати") { dismiss() }
+                            .buttonStyle(LedgeButtonStyle(fill: .clear, text: Theme.inkSoft, ledge: .clear))
+                            .frame(width: (g.size.width - 12) / 3)
+                        Button(editing == nil ? "Додати" : "Зберегти", action: save)
+                            .buttonStyle(.primaryLedge)
+                            .frame(width: (g.size.width - 12) * 2 / 3)
+                            .accessibilityIdentifier("savePlan")
+                    }
                 }
+                .frame(height: 58)
                 .padding(.top, 24)
 
                 if editing != nil {

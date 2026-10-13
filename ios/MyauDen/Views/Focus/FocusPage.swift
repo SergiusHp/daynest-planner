@@ -31,16 +31,19 @@ struct FocusPage: View {
 
                 VStack(spacing: 16) {
                     TaskPicker()
-                    HStack(spacing: 12) {
-                        Button("Скинути") { focus.reset() }
-                            .buttonStyle(LedgeButtonStyle(fill: Theme.cream, text: Theme.ink, ledge: Theme.chip, border: Theme.chip))
-                            .accessibilityIdentifier("resetButton")
-                        Button(focus.statusTitle) { focus.playPause() }
-                            .buttonStyle(LedgeButtonStyle(fill: Theme.accent, text: Theme.onAccent, ledge: Theme.brown, border: Theme.brown))
-                            .layoutPriority(1)
-                            .frame(maxWidth: .infinity)
-                            .accessibilityIdentifier("playButton")
+                    GeometryReader { g in
+                        HStack(spacing: 12) {
+                            Button("Скинути") { focus.reset() }
+                                .buttonStyle(LedgeButtonStyle(fill: Theme.cream, text: Theme.ink, ledge: Theme.chip, border: Theme.chip))
+                                .frame(width: (g.size.width - 12) / 3)
+                                .accessibilityIdentifier("resetButton")
+                            Button(focus.statusTitle) { focus.playPause() }
+                                .buttonStyle(LedgeButtonStyle(fill: Theme.accent, text: Theme.onAccent, ledge: Theme.brown, border: Theme.brown))
+                                .frame(width: (g.size.width - 12) * 2 / 3)
+                                .accessibilityIdentifier("playButton")
+                        }
                     }
+                    .frame(height: 58)
                     SessionsLine(count: focus.sessions)
                 }
                 .padding(.top, 8)

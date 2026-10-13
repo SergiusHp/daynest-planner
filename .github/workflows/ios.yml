@@ -34,11 +34,14 @@ jobs:
           import json, os
           m = json.load(open('manifest.json'))
           for t in m:
-              for a in t.get('attachments', []):
-                  src = a.get('exportedFileName'); name = a.get('suggestedHumanReadableName', src)
-                  if src and os.path.exists(src):
-                      base = name.split('_')[0] if name else src
-                      os.rename(src, base + os.path.splitext(src)[1])
+              test = (t.get('testIdentifier') or 'x').split('/')[-1].replace('()', '')
+              for i, a in enumerate(t.get('attachments', [])):
+                  src = a.get('exportedFileName'); name = a.get('suggestedHumanReadableName', src) or src
+                  if not (src and os.path.exists(src)): continue
+                  ext = os.path.splitext(src)[1]
+                  if ext == '.png': os.rename(src, name.split('_')[0] + ext)
+                  elif ext == '.txt' and name.startswith('App UI hierarchy'): os.rename(src, f'hier-{test}-{i}.txt')
+                  else: os.remove(src)
           PY
           fi
           ls -la

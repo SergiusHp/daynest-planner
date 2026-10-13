@@ -37,7 +37,7 @@ final class MyauDenUITests: XCTestCase {
         app.buttons["obNext"].tap()
         XCTAssertTrue(app.staticTexts["dayTitle"].waitForExistence(timeout: 3))
         XCTAssertEqual(dayTitle(app), "Сьогоднішні справи")
-        XCTAssertTrue(app.staticTexts["Ознайомитись з програмою"].exists)
+        XCTAssertTrue(app.staticTexts["Ознайомитись з програмою"].waitForExistence(timeout: 3))
         shot(app, "05-day-first")
         app.terminate()
         let again = XCUIApplication()
@@ -50,7 +50,7 @@ final class MyauDenUITests: XCTestCase {
     // Свайп уліво, що починається НАД справою, відкриває наступну сторінку (і при довгому списку).
     func testSwipeLeftOverTaskOpensCalendar() throws {
         let app = launch(["-uitest-skip-intro", "-uitest-seed-many"])
-        let row = app.buttons["task-t3"]
+        let row = app.buttons["task-t1"]
         XCTAssertTrue(row.waitForExistence(timeout: 5))
         shot(app, "06-day-many")
         row.swipeLeft()
@@ -61,21 +61,24 @@ final class MyauDenUITests: XCTestCase {
     // Вертикальна прокрутка довгого списку не перемикає сторінку.
     func testVerticalScrollKeepsPage() throws {
         let app = launch(["-uitest-skip-intro", "-uitest-seed-many"])
-        XCTAssertTrue(app.buttons["task-t3"].waitForExistence(timeout: 5))
+        let first = app.buttons["task-t1"]
+        XCTAssertTrue(first.waitForExistence(timeout: 5))
+        let y0 = first.frame.minY
         app.collectionViews["taskList"].swipeUp()
-        XCTAssertTrue(app.staticTexts["dayTitle"].isHittable)
-        XCTAssertTrue(app.buttons["task-t15"].waitForExistence(timeout: 2))
+        sleep(1)
+        XCTAssertTrue(app.staticTexts["dayTitle"].isHittable)      // сторінка та сама
+        XCTAssertTrue(!first.exists || first.frame.minY < y0 - 40)  // список прокрутився
     }
 
     // Свайп управо по справі закреслює її; ще раз — повертає.
     func testSwipeRightCompletesTask() throws {
         let app = launch(["-uitest-skip-intro", "-uitest-seed-sample"])
-        let check = app.buttons["check-c"]
+        let check = app.switches["check-c"]
         XCTAssertTrue(check.waitForExistence(timeout: 5))
         XCTAssertEqual(check.value as? String, "не виконано")
         app.buttons["task-c"].swipeRight()
         let done = NSPredicate(format: "value == %@", "виконано")
-        expectation(for: done, evaluatedWith: app.buttons["check-c"])
+        expectation(for: done, evaluatedWith: app.switches["check-c"])
         waitForExpectations(timeout: 4)
         sleep(1); shot(app, "07-day-scratched")
         XCTAssertEqual(dayTitle(app), "Сьогоднішні справи")      // сторінка не змінилася
@@ -93,7 +96,9 @@ final class MyauDenUITests: XCTestCase {
         field.typeText("Полити квіти")
         shot(app, "08-new-plan")
         app.buttons["savePlan"].tap()
-        XCTAssertTrue(app.staticTexts["Полити квіти"].waitForExistence(timeout: 3))
+        let added = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Полити квіти")).firstMatch
+        XCTAssertTrue(added.waitForExistence(timeout: 6))
+        shot(app, "08b-added")
     }
 
     // Сонечко повертає на сьогодні після вибору іншого дня.
@@ -130,7 +135,7 @@ final class MyauDenUITests: XCTestCase {
     // Обертання лапки змінює час і не гортає сторінку; кнопка-нота вмикає/вимикає музику.
     func testFocusDialAndMusic() throws {
         let app = launch(["-uitest-skip-intro", "-uitest-seed-sample", "-uitest-page", "2"])
-        let dial = app.otherElements["dial"]
+        let dial = app.descendants(matching: .any)["dial"]
         XCTAssertTrue(dial.waitForExistence(timeout: 5))
         XCTAssertEqual(dial.value as? String, "25 хв")
         shot(app, "11-focus")

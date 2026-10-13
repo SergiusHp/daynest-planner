@@ -139,7 +139,7 @@ struct SwipeDemo: View {
             .background(Capsule().fill(Theme.tog))
             .frame(width: 300)
             .offset(y: 22)
-            Text("\(DayKey.monthNom[DayKey.month(now)]) \(DayKey.year(now))")
+            Text(verbatim: "\(DayKey.monthNom[DayKey.month(now)]) \(DayKey.year(now))")
                 .font(.nunitoFixed(16, .extraBold)).foregroundStyle(Theme.ink)
                 .offset(x: 20, y: 56)
             LazyVGrid(columns: Array(repeating: GridItem(.fixed(260 / 7), spacing: 0), count: 7), spacing: 2) {
