@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MeowDay — Support / Підтримка</title>
+<meta name="description" content="MeowDay support: contact and answers to common questions. Підтримка МяуДень.">
+<meta name="robots" content="index, follow">
+<style>
+  :root {
+    --bg: #fef1d9;
+    --card: #fffaf0;
+    --line: #f8dcb1;
+    --ink: #2b1a0d;
+    --ink-soft: #4a3322;
+    --muted: #86664a;
+    --accent: #c95a1d;
+    --accent-soft: #fde5c4;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .logo { width: 52px; height: 52px; flex: none; }
+  .brand { font-weight: 800; font-size: 22px; letter-spacing: .2px; }
+  .brand span { color: #f67a36; }
+  .lang { display: flex; gap: 6px; margin: 20px 0 8px; }
+  .lang a {
+    text-decoration: none; color: var(--ink); font-weight: 700; font-size: 15px;
+    padding: 8px 16px; border-radius: 999px; background: var(--accent-soft);
+  }
+  .lang a[aria-current="true"] { background: var(--accent); color: #fffaf0; }
+  section.page { background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 28px 24px; margin-top: 16px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 8px; }
+  h2 { font-size: 19px; color: var(--accent); margin: 28px 0 6px; }
+  p, li { color: var(--ink-soft); }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .meta { color: var(--muted); font-size: 15px; margin: 0 0 2px; }
+  .summary {
+    margin: 18px 0 4px; padding: 14px 16px; border-radius: 14px;
+    background: var(--accent-soft); border-left: 5px solid var(--accent); color: var(--ink);
+  }
+  a { color: var(--accent); }
+  footer { color: var(--muted); font-size: 14px; text-align: center; margin-top: 28px; }
+  /* без JavaScript видно всі мови; з JavaScript — обрану */
+  .js section.page[hidden] { display: none; }
+  @media (max-width: 480px) {
+    section.page { padding: 22px 16px; border-radius: 18px; }
+    h1 { font-size: 24px; }
+  }
+  .faq h2 { margin-top: 24px; }
+  .lang { flex-wrap: wrap; }
+  .lang a { white-space: nowrap; padding: 8px 14px; }
+  .contact { font-size: 19px; font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="32" fill="#f67a36"/>
+      <ellipse cx="18" cy="26" rx="5.5" ry="7" fill="#fffaf0"/>
+      <ellipse cx="27" cy="17" rx="5.5" ry="7" fill="#fffaf0"/>
+      <ellipse cx="37" cy="17" rx="5.5" ry="7" fill="#fffaf0"/>
+      <ellipse cx="46" cy="26" rx="5.5" ry="7" fill="#fffaf0"/>
+      <path d="M32 29c-8 0-15 7-15 14 0 5 4 8 9 7 2-.4 4-1.2 6-1.2s4 .8 6 1.2c5 1 9-2 9-7 0-7-7-14-15-14z" fill="#fffaf0"/>
+    </svg>
+    <div class="brand">Meow<span>Day</span></div>
+  </header>
+
+  <nav class="lang" aria-label="Language">
+    <a href="#en" data-lang="en" aria-current="true">English</a>
+    <a href="#uk" data-lang="uk">Українська</a>
+    <a href="#de" data-lang="de">Deutsch</a>
+    <a href="#ja" data-lang="ja">日本語</a>
+  </nav>
+
+  <section class="page faq" id="en" lang="en">
+    <h1>MeowDay Support</h1>
+    <p class="summary">Need help or have an idea? Write to us — we read every message.</p>
+    <p class="contact">Email: <a href="mailto:lapchukphoto@gmail.com?subject=MeowDay">lapchukphoto@gmail.com</a></p>
+    <h2>How do I get MeowDay PRO back on a new iPhone?</h2>
+    <p>Open Settings (the gear on the Focus or Month page) → MeowDay PRO → <strong>Restore purchases</strong>. Use the same Apple Account you bought PRO with. You never pay twice.</p>
+    <h2>How do I move my tasks to a new phone?</h2>
+    <p>On the old phone: Settings → <strong>Backup</strong> → <strong>Export</strong>, and save the file to iCloud Drive, Google Drive or Files. On the new phone: Settings → <strong>Backup</strong> → <strong>Import</strong>, and choose that file. With PRO, an automatic copy can be saved to a folder you choose every day.</p>
+    <h2>Reminders don’t arrive</h2>
+    <p>On your iPhone, open Settings → Notifications → MeowDay and turn on <strong>Allow Notifications</strong>. Also check that a Focus mode (Do Not Disturb, Sleep) isn’t hiding them. If reminders appear only on your Apple Watch, check the Focus settings on your iPhone.</p>
+    <h2>How do I use MeowDay on Apple Watch?</h2>
+    <p>The Apple Watch app is part of MeowDay PRO. If it isn’t on your watch yet, open the Watch app on your iPhone, find MeowDay in the list of available apps and tap <strong>Install</strong>.</p>
+    <h2>Is my data safe?</h2>
+    <p>MeowDay has no accounts, no ads and no servers. Your tasks stay on your device. More in the <a href="https://sergiushp.github.io/daynest-planner/privacy.html#en">Privacy Policy</a>.</p>
+    <h2>Something isn’t working</h2>
+    <p>Write to us and tell us your iPhone model, iOS version and what happened. A screenshot helps a lot.</p>
+    <p class="meta"><a href="https://sergiushp.github.io/daynest-planner/privacy.html#en">Privacy Policy</a></p>
+  </section>
+
+  <section class="page faq" id="uk" lang="uk">
+    <h1>Підтримка МяуДень</h1>
+    <p class="summary">Потрібна допомога чи маєш ідею? Напиши нам — ми читаємо кожен лист.</p>
+    <p class="contact">Пошта: <a href="mailto:lapchukphoto@gmail.com?subject=MeowDay">lapchukphoto@gmail.com</a></p>
+    <h2>Як повернути МяуДень PRO на новому iPhone?</h2>
+    <p>Відкрий Налаштування (шестерня на сторінці «Фокус» чи «Місяць») → МяуДень PRO → <strong>Відновити покупки</strong>. Використай той самий обліковий запис Apple, з яким купував PRO. Платити вдруге не треба.</p>
+    <h2>Як перенести справи на новий телефон?</h2>
+    <p>На старому телефоні: Налаштування → <strong>Резервна копія</strong> → <strong>Експорт</strong> і збережи файл в iCloud Drive, Google Drive чи «Файли». На новому: Налаштування → <strong>Резервна копія</strong> → <strong>Імпорт</strong> і вибери цей файл. З PRO копія може щодня сама зберігатися в обрану папку.</p>
+    <h2>Не приходять нагадування</h2>
+    <p>На iPhone відкрий Параметри → Сповіщення → МяуДень і увімкни <strong>Дозволити сповіщення</strong>. Перевір також, чи не приховує їх режим зосередження («Не турбувати», «Сон»). Якщо нагадування з’являються лише на Apple Watch — перевір режими зосередження на iPhone.</p>
+    <h2>Як користуватися МяуДнем на Apple Watch?</h2>
+    <p>Застосунок для Apple Watch входить у МяуДень PRO. Якщо його ще немає на годиннику, відкрий на iPhone застосунок Watch, знайди МяуДень у списку доступних програм і натисни <strong>Встановити</strong>.</p>
+    <h2>Чи в безпеці мої дані?</h2>
+    <p>У МяуДні немає акаунтів, реклами й серверів. Твої справи лишаються на твоєму пристрої. Детальніше — у <a href="https://sergiushp.github.io/daynest-planner/privacy.html#uk">Політиці конфіденційності</a>.</p>
+    <h2>Щось не працює</h2>
+    <p>Напиши нам модель iPhone, версію iOS і що сталося. Знімок екрана дуже допоможе.</p>
+    <p class="meta"><a href="https://sergiushp.github.io/daynest-planner/privacy.html#uk">Політика конфіденційності</a></p>
+  </section>
+
+  <section class="page faq" id="de" lang="de">
+    <h1>Miau-Tag Support</h1>
+    <p class="summary">Brauchst du Hilfe oder hast du eine Idee? Schreib uns – wir lesen jede Nachricht.</p>
+    <p class="contact">E-Mail: <a href="mailto:lapchukphoto@gmail.com?subject=MeowDay">lapchukphoto@gmail.com</a></p>
+    <h2>Wie bekomme ich Miau-Tag PRO auf einem neuen iPhone zurück?</h2>
+    <p>Öffne die Einstellungen (Zahnrad auf der Seite „Fokus“ oder „Monat“) → Miau-Tag PRO → <strong>Käufe wiederherstellen</strong>. Nutze denselben Apple Account, mit dem du PRO gekauft hast. Du zahlst nie doppelt.</p>
+    <h2>Wie übertrage ich meine Aufgaben auf ein neues Telefon?</h2>
+    <p>Auf dem alten Telefon: Einstellungen → <strong>Sicherung</strong> → <strong>Export</strong> und die Datei in iCloud Drive, Google Drive oder „Dateien“ sichern. Auf dem neuen: Einstellungen → <strong>Sicherung</strong> → <strong>Import</strong> und diese Datei wählen. Mit PRO kann jeden Tag automatisch eine Kopie in einem Ordner deiner Wahl gespeichert werden.</p>
+    <h2>Erinnerungen kommen nicht an</h2>
+    <p>Öffne auf dem iPhone Einstellungen → Mitteilungen → Miau-Tag und schalte <strong>Mitteilungen erlauben</strong> ein. Prüfe auch, ob ein Fokus („Nicht stören“, „Schlafen“) sie ausblendet. Erscheinen Erinnerungen nur auf der Apple Watch, prüfe die Fokus-Einstellungen am iPhone.</p>
+    <h2>Wie nutze ich Miau-Tag auf der Apple Watch?</h2>
+    <p>Die Apple Watch-App gehört zu Miau-Tag PRO. Ist sie noch nicht auf deiner Uhr, öffne auf dem iPhone die Watch-App, suche Miau-Tag unter den verfügbaren Apps und tippe auf <strong>Installieren</strong>.</p>
+    <h2>Sind meine Daten sicher?</h2>
+    <p>Miau-Tag hat kein Konto, keine Werbung und keine Server. Deine Aufgaben bleiben auf deinem Gerät. Mehr in der <a href="https://sergiushp.github.io/daynest-planner/privacy.html#en">Datenschutzerklärung</a> (auf Englisch).</p>
+    <h2>Etwas funktioniert nicht</h2>
+    <p>Schreib uns dein iPhone-Modell, die iOS-Version und was passiert ist. Ein Bildschirmfoto hilft sehr.</p>
+    <p class="meta"><a href="https://sergiushp.github.io/daynest-planner/privacy.html#en">Datenschutz</a></p>
+  </section>
+
+  <section class="page faq" id="ja" lang="ja">
+    <h1>にゃんデー サポート</h1>
+    <p class="summary">お困りのことやアイデアがあれば、お気軽にご連絡ください。すべてのメッセージに目を通しています。</p>
+    <p class="contact">メール: <a href="mailto:lapchukphoto@gmail.com?subject=MeowDay">lapchukphoto@gmail.com</a></p>
+    <h2>新しい iPhone で にゃんデーPRO を復元するには？</h2>
+    <p>設定（「集中」または「ひと月」ページの歯車）→ にゃんデーPRO →<strong>「購入を復元」</strong>をタップしてください。PRO を購入したときと同じ Apple アカウントを使います。二重に支払うことはありません。</p>
+    <h2>新しい iPhone にやることを移すには？</h2>
+    <p>古い iPhone で：設定 →<strong>「バックアップ」</strong>→<strong>「書き出し」</strong>で、ファイルを iCloud Drive、Google Drive、「ファイル」に保存します。新しい iPhone で：設定 →<strong>「バックアップ」</strong>→<strong>「読み込み」</strong>で、そのファイルを選びます。PRO なら、選んだフォルダに毎日自動でコピーを保存できます。</p>
+    <h2>通知が届かない</h2>
+    <p>iPhone の 設定 → 通知 → にゃんデー で<strong>「通知を許可」</strong>をオンにしてください。集中モード（おやすみモード、睡眠）で隠れていないかも確認してください。Apple Watch にだけ通知が出る場合は、iPhone の集中モードの設定を確認してください。</p>
+    <h2>Apple Watch で使うには？</h2>
+    <p>Apple Watch アプリは にゃんデーPRO に含まれます。まだウォッチに入っていない場合は、iPhone の Watch アプリで「利用可能な App」から にゃんデー を探して<strong>「インストール」</strong>をタップしてください。</p>
+    <h2>データは安全ですか？</h2>
+    <p>にゃんデーにはアカウント、広告、サーバーがありません。やることはあなたのデバイスの中だけに保存されます。詳しくは<a href="https://sergiushp.github.io/daynest-planner/privacy.html#en">プライバシーポリシー</a>（英語）をご覧ください。</p>
+    <h2>うまく動かないときは</h2>
+    <p>iPhone の機種、iOS のバージョン、何が起きたかをメールでお知らせください。スクリーンショットがあるととても助かります。</p>
+    <p class="meta"><a href="https://sergiushp.github.io/daynest-planner/privacy.html#en">プライバシーポリシー</a></p>
+  </section>
+
+  <footer>© 2026 Serhii Lapchuk · MeowDay</footer>
+</main>
+<script>
+  // Перемикач мови: …/support.html#uk, #de, #ja; без мітки — мова браузера, інакше англійська.
+  (function () {
+    document.documentElement.classList.add('js');
+    var links = document.querySelectorAll('.lang a');
+    var ids = ['en', 'uk', 'de', 'ja'];
+    function show(lang) {
+      if (ids.indexOf(lang) < 0) lang = 'en';
+      ids.forEach(function (k) { document.getElementById(k).hidden = k !== lang; });
+      links.forEach(function (a) { a.setAttribute('aria-current', a.dataset.lang === lang ? 'true' : 'false'); });
+      document.documentElement.lang = lang;
+    }
+    var initial = (location.hash || '').slice(1);
+    if (!initial) {
+      var nav = (navigator.language || '').toLowerCase().slice(0, 2);
+      initial = nav === 'ru' ? 'uk' : nav;
+    }
+    show(initial);
+    links.forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        history.replaceState(null, '', '#' + a.dataset.lang);
+        show(a.dataset.lang);
+        window.scrollTo(0, 0);
+      });
+    });
+    window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
+  })();
+</script>
+</body>
+</html>
